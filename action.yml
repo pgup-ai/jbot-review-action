@@ -11,7 +11,7 @@ inputs:
     default: ""
   api-key:
     description: "API key for the selected provider."
-    required: false
+    required: true
   github-token:
     description: "Token to read the PR and post the review."
     required: true

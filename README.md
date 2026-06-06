@@ -39,7 +39,7 @@ jobs:
 |---|---|---|---|
 | `provider` | No | `opencode` | LLM provider (opencode, deepseek, openai, anthropic, openrouter) |
 | `model` | No | Provider default | Model as `provider/model` |
-| `api-key` | Yes | — | API key for the selected provider |
+| `api-key` | Yes | — | API key for the selected provider (matches the `provider` value) |
 | `github-token` | Yes | `${{ github.token }}` | Token for posting the review |
 
 See [models.dev](https://models.dev/) for the full list of available models.
