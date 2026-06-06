@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: jingbof/jbot-review-action@v1
+      - uses: jingbof/jbot-review-action@v0.1.0
         with:
           api-key: ${{ secrets.OPENCODE_API_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -43,3 +43,16 @@ jobs:
 | `github-token` | Yes | `${{ github.token }}` | Token for posting the review |
 
 See [models.dev](https://models.dev/) for the full list of available models.
+
+## Versioning
+
+This project is in beta. Tags follow [SemVer](https://semver.org/): pinned to
+`v0.1.0` for now. While in `0.x.y`, breaking changes may ship on any minor
+bump. The first `v1.0.0` will mark API stability.
+
+Pin to a specific tag for reproducibility. To track the latest beta:
+
+```yaml
+- uses: jingbof/jbot-review-action@v0
+  # equivalent to the latest v0.x.y release
+```
