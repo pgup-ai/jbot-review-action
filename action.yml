@@ -37,10 +37,6 @@ inputs:
     description: 'xAI API key. Required when provider=xai.'
     required: false
     default: ''
-  kilo-api-key:
-    description: 'Kilo Gateway API key. Required when provider=kilo.'
-    required: false
-    default: ''
   github-token:
     description: 'Token to read the PR and post the review.'
     required: true
@@ -84,7 +80,6 @@ runs:
     INPUT_ANTHROPIC-API-KEY: ${{ inputs.anthropic-api-key }}
     INPUT_OPENROUTER-API-KEY: ${{ inputs.openrouter-api-key }}
     INPUT_XAI-API-KEY: ${{ inputs.xai-api-key }}
-    INPUT_KILO-API-KEY: ${{ inputs.kilo-api-key }}
     INPUT_GITHUB-TOKEN: ${{ inputs.github-token }}
     INPUT_PR-NUMBER: ${{ inputs.pr-number }}
     INPUT_DRY-RUN: ${{ inputs.dry-run }}
