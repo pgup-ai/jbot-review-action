@@ -68,6 +68,10 @@ The action reads only the key input matching the selected `provider`, so the
 example can pass multiple provider secrets and leave unused ones empty. If
 `model` is set, its `provider/model` prefix must match the selected `provider`.
 
+Migrating from `api-key`: replace the old unified `api-key` input with the
+matching provider-specific input, such as `opencode-api-key` for
+`provider: opencode`. The unified input is not read by current `v0` builds.
+
 ## Versioning
 
 This project is in beta. Tags follow [SemVer](https://semver.org/): pinned to
