@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: jingbof/jbot-review-action@v0.1.0
+      - uses: jingbof/jbot-review-action@v0   # latest v0.x.y
         with:
           api-key: ${{ secrets.OPENCODE_API_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
