@@ -13,9 +13,30 @@ inputs:
     description: 'Model as provider/model. Uses provider default if unset.'
     required: false
     default: ''
-  api-key:
-    description: 'API key for the selected provider.'
-    required: true
+  opencode-api-key:
+    description: 'OpenCode API key. Required when provider=opencode.'
+    required: false
+    default: ''
+  deepseek-api-key:
+    description: 'DeepSeek API key. Required when provider=deepseek.'
+    required: false
+    default: ''
+  openai-api-key:
+    description: 'OpenAI API key. Required when provider=openai.'
+    required: false
+    default: ''
+  anthropic-api-key:
+    description: 'Anthropic API key. Required when provider=anthropic.'
+    required: false
+    default: ''
+  openrouter-api-key:
+    description: 'OpenRouter API key. Required when provider=openrouter.'
+    required: false
+    default: ''
+  xai-api-key:
+    description: 'xAI API key. Required when provider=xai.'
+    required: false
+    default: ''
   github-token:
     description: 'Token to read the PR and post the review.'
     required: true
@@ -53,7 +74,12 @@ runs:
   env:
     INPUT_PROVIDER: ${{ inputs.provider }}
     INPUT_MODEL: ${{ inputs.model }}
-    INPUT_API-KEY: ${{ inputs.api-key }}
+    INPUT_OPENCODE-API-KEY: ${{ inputs.opencode-api-key }}
+    INPUT_DEEPSEEK-API-KEY: ${{ inputs.deepseek-api-key }}
+    INPUT_OPENAI-API-KEY: ${{ inputs.openai-api-key }}
+    INPUT_ANTHROPIC-API-KEY: ${{ inputs.anthropic-api-key }}
+    INPUT_OPENROUTER-API-KEY: ${{ inputs.openrouter-api-key }}
+    INPUT_XAI-API-KEY: ${{ inputs.xai-api-key }}
     INPUT_GITHUB-TOKEN: ${{ inputs.github-token }}
     INPUT_PR-NUMBER: ${{ inputs.pr-number }}
     INPUT_DRY-RUN: ${{ inputs.dry-run }}
