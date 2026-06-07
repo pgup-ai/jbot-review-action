@@ -1,33 +1,63 @@
-name: "jbot-review"
-description: "Agentic PR review via opencode serve + SDK, with gated inline posting."
+name: 'jbot-review'
+description: 'Agentic PR review via opencode serve + SDK, with gated inline posting.'
 
 branding:
-  icon: "git-pull-request"
-  color: "purple"
+  icon: 'git-pull-request'
+  color: 'purple'
 
 inputs:
   provider:
-    description: "LLM provider (defaults to opencode)."
-    default: "opencode"
+    description: 'LLM provider (defaults to opencode).'
+    default: 'opencode'
   model:
-    description: "Model as provider/model. Uses provider default if unset."
+    description: 'Model as provider/model. Uses provider default if unset.'
     required: false
-    default: ""
+    default: ''
   api-key:
-    description: "API key for the selected provider."
+    description: 'API key for the selected provider.'
     required: true
   github-token:
-    description: "Token to read the PR and post the review."
+    description: 'Token to read the PR and post the review.'
     required: true
     default: ${{ github.token }}
+  pr-number:
+    description: 'Pull request number for manual workflow_dispatch runs.'
+    required: false
+    default: ''
+  dry-run:
+    description: 'Log the review body and inline comments without posting to GitHub.'
+    required: false
+    default: 'false'
+  max-findings:
+    description: 'Maximum number of findings to post or log. Use 0 for no limit.'
+    required: false
+    default: '0'
+  min-severity:
+    description: 'Minimum severity to include: P0, P1, P2, P3, or nit.'
+    required: false
+    default: 'nit'
+  include-prior-comments:
+    description: 'Include prior PR review comments in the review context.'
+    required: false
+    default: 'true'
+  fail-on-error:
+    description: 'Fail the workflow when the review cannot complete.'
+    required: false
+    default: 'true'
 
 runs:
-  using: "docker"
-  image: "docker://ghcr.io/pgup-ai/jbot-review:latest"
-  entrypoint: "node"
-  args: ["/app/dist/workflow/index.js"]
+  using: 'docker'
+  image: 'docker://ghcr.io/pgup-ai/jbot-review:latest'
+  entrypoint: 'node'
+  args: ['/app/dist/workflow/index.js']
   env:
     INPUT_PROVIDER: ${{ inputs.provider }}
     INPUT_MODEL: ${{ inputs.model }}
     INPUT_API-KEY: ${{ inputs.api-key }}
     INPUT_GITHUB-TOKEN: ${{ inputs.github-token }}
+    INPUT_PR-NUMBER: ${{ inputs.pr-number }}
+    INPUT_DRY-RUN: ${{ inputs.dry-run }}
+    INPUT_MAX-FINDINGS: ${{ inputs.max-findings }}
+    INPUT_MIN-SEVERITY: ${{ inputs.min-severity }}
+    INPUT_INCLUDE-PRIOR-COMMENTS: ${{ inputs.include-prior-comments }}
+    INPUT_FAIL-ON-ERROR: ${{ inputs.fail-on-error }}
