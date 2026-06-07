@@ -32,7 +32,13 @@ jobs:
         with:
           provider: ${{ vars.JBOT_REVIEW_PROVIDER || 'opencode' }}
           model: ${{ vars.JBOT_REVIEW_MODEL || '' }}
-          api-key: ${{ secrets.OPENCODE_API_KEY }}
+          opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
+          deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          openrouter-api-key: ${{ secrets.OPENROUTER_API_KEY }}
+          xai-api-key: ${{ secrets.XAI_API_KEY }}
+          kilo-api-key: ${{ secrets.KILO_API_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
@@ -40,9 +46,15 @@ jobs:
 
 | Input | Required | Default | Description |
 |---|---|---|---|
-| `provider` | No | `opencode` | LLM provider (opencode, deepseek, openai, anthropic, openrouter) |
+| `provider` | No | `opencode` | LLM provider (opencode, deepseek, openai, anthropic, openrouter, xai, kilo) |
 | `model` | No | Provider default | Model as `provider/model` |
-| `api-key` | Yes | — | API key for the selected provider (matches the `provider` value) |
+| `opencode-api-key` | No | — | Required when `provider=opencode` |
+| `deepseek-api-key` | No | — | Required when `provider=deepseek` |
+| `openai-api-key` | No | — | Required when `provider=openai` |
+| `anthropic-api-key` | No | — | Required when `provider=anthropic` |
+| `openrouter-api-key` | No | — | Required when `provider=openrouter` |
+| `xai-api-key` | No | — | Required when `provider=xai` |
+| `kilo-api-key` | No | — | Required when `provider=kilo` |
 | `github-token` | Yes | `${{ github.token }}` | Token for posting the review |
 | `pr-number` | No | — | PR number for manual `workflow_dispatch` runs |
 | `dry-run` | No | `false` | Log review output without posting comments |
@@ -54,8 +66,9 @@ jobs:
 See [models.dev](https://models.dev/) for the full list of available models.
 Use repository or organization Actions variables `JBOT_REVIEW_PROVIDER` and
 `JBOT_REVIEW_MODEL` to change future review runs without editing workflow YAML.
-Keep `api-key` matched to the selected provider; the example uses
-`OPENCODE_API_KEY` because `opencode` is the default.
+The action reads only the key input matching the selected `provider`, so the
+example can pass multiple provider secrets and leave unused ones empty. If
+`model` is set, its `provider/model` prefix must match the selected `provider`.
 
 ## Versioning
 
