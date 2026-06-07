@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: jingbof/jbot-review-action@v0   # latest v0.x.y
+      - uses: pgup-ai/jbot-review-action@v0   # latest v0.x.y
         with:
           api-key: ${{ secrets.OPENCODE_API_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -54,6 +54,6 @@ bump. The first `v1.0.0` will mark API stability.
 Pin to a specific tag for reproducibility. To track the latest beta:
 
 ```yaml
-- uses: jingbof/jbot-review-action@v0
+- uses: pgup-ai/jbot-review-action@v0
   # equivalent to the latest v0.x.y release
 ```
