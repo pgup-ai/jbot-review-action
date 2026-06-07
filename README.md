@@ -37,6 +37,7 @@ jobs:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
           openrouter-api-key: ${{ secrets.OPENROUTER_API_KEY }}
+          nvidia-api-key: ${{ secrets.NVIDIA_API_KEY }}
           xai-api-key: ${{ secrets.XAI_API_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -45,13 +46,14 @@ jobs:
 
 | Input | Required | Default | Description |
 |---|---|---|---|
-| `provider` | No | `opencode` | LLM provider (opencode, deepseek, openai, anthropic, openrouter, xai) |
+| `provider` | No | `opencode` | LLM provider (opencode, deepseek, openai, anthropic, openrouter, nvidia, xai) |
 | `model` | No | Provider default | Model as `provider/model` |
 | `opencode-api-key` | No | — | Required when `provider=opencode` |
 | `deepseek-api-key` | No | — | Required when `provider=deepseek` |
 | `openai-api-key` | No | — | Required when `provider=openai` |
 | `anthropic-api-key` | No | — | Required when `provider=anthropic` |
 | `openrouter-api-key` | No | — | Required when `provider=openrouter` |
+| `nvidia-api-key` | No | — | Required when `provider=nvidia` |
 | `xai-api-key` | No | — | Required when `provider=xai` |
 | `github-token` | Yes | `${{ github.token }}` | Token for posting the review |
 | `pr-number` | No | — | PR number for manual `workflow_dispatch` runs |
@@ -64,10 +66,15 @@ jobs:
 See [models.dev](https://models.dev/) for the full list of available models.
 Use repository or organization Actions variables `JBOT_REVIEW_PROVIDER` and
 `JBOT_REVIEW_MODEL` to change future review runs without editing workflow YAML.
-The action reads only the key input matching the selected `provider`, so the
-example can pass multiple provider secrets and leave unused ones empty. This
-convenience pattern exposes every configured provider key to the action runtime.
-For a least-privilege setup, pass only the selected provider's key:
+The action reads only the key matching the selected `provider`, so the example
+can pass multiple provider secrets and leave unused ones empty. It accepts
+provider and model from either action inputs or environment variables:
+`provider`, `JBOT_REVIEW_PROVIDER`, or `PROVIDER` for the provider, and `model`,
+`JBOT_REVIEW_MODEL`, or `MODEL` for the model. Provider API keys can also be
+supplied through their standard env vars, such as `OPENROUTER_API_KEY` or
+`NVIDIA_API_KEY`. This convenience pattern exposes every configured provider key
+to the action runtime. For a least-privilege setup, pass only the selected
+provider's key:
 
 ```yaml
 with:
