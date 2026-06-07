@@ -65,8 +65,20 @@ See [models.dev](https://models.dev/) for the full list of available models.
 Use repository or organization Actions variables `JBOT_REVIEW_PROVIDER` and
 `JBOT_REVIEW_MODEL` to change future review runs without editing workflow YAML.
 The action reads only the key input matching the selected `provider`, so the
-example can pass multiple provider secrets and leave unused ones empty. If
-`model` is set, its `provider/model` prefix must match the selected `provider`.
+example can pass multiple provider secrets and leave unused ones empty. This
+convenience pattern exposes every configured provider key to the action runtime.
+For a least-privilege setup, pass only the selected provider's key:
+
+```yaml
+with:
+  provider: opencode
+  model: ${{ vars.JBOT_REVIEW_MODEL || '' }}
+  opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
+  github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+If `model` is set, its `provider/model` prefix must match the selected
+`provider`.
 
 Migrating from `api-key`: replace the old unified `api-key` input with the
 matching provider-specific input, such as `opencode-api-key` for
