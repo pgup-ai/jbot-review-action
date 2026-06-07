@@ -1,6 +1,10 @@
 name: "jbot-review"
 description: "Agentic PR review via opencode serve + SDK, with gated inline posting."
 
+branding:
+  icon: "git-pull-request"
+  color: "purple"
+
 inputs:
   provider:
     description: "LLM provider (defaults to opencode)."
