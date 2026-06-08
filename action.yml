@@ -46,6 +46,10 @@ inputs:
     description: 'Token to read the PR and post the review.'
     required: true
     default: ${{ github.token }}
+  thread-resolution-token:
+    description: 'Optional token used only to resolve addressed review threads. Falls back to github-token when unset.'
+    required: false
+    default: ''
   pr-number:
     description: 'Pull request number for manual workflow_dispatch runs.'
     required: false
@@ -87,6 +91,7 @@ runs:
     INPUT_NVIDIA-API-KEY: ${{ inputs.nvidia-api-key }}
     INPUT_XAI-API-KEY: ${{ inputs.xai-api-key }}
     INPUT_GITHUB-TOKEN: ${{ inputs.github-token }}
+    INPUT_THREAD-RESOLUTION-TOKEN: ${{ inputs.thread-resolution-token }}
     INPUT_PR-NUMBER: ${{ inputs.pr-number }}
     INPUT_DRY-RUN: ${{ inputs.dry-run }}
     INPUT_MAX-FINDINGS: ${{ inputs.max-findings }}
