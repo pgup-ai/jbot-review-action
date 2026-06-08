@@ -1,0 +1,57 @@
+name: jbot-review
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, synchronize]
+  workflow_dispatch:
+    inputs:
+      pr-number:
+        description: Pull request number to review
+        required: true
+      provider:
+        description: "LLM provider. Uses JBOT_REVIEW_PROVIDER or opencode if unset."
+        required: false
+        default: ""
+      model:
+        description: "Model as provider/model. Uses provider default if unset."
+        required: false
+        default: ""
+      dry-run:
+        description: Log review output without posting to GitHub
+        required: false
+        default: "false"
+
+concurrency:
+  group: jbot-review-${{ github.event.pull_request.number || inputs['pr-number'] || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: read
+  packages: read
+
+jobs:
+  review:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || format('refs/pull/{0}/merge', inputs['pr-number']) }}
+
+      - uses: pgup-ai/jbot-review-action@v0
+        with:
+          provider: ${{ inputs.provider || vars.JBOT_REVIEW_PROVIDER || 'opencode' }}
+          model: ${{ inputs.model || vars.JBOT_REVIEW_MODEL || '' }}
+          pr-number: ${{ github.event.pull_request.number || inputs['pr-number'] }}
+          dry-run: ${{ inputs['dry-run'] || 'false' }}
+          opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
+          deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          openrouter-api-key: ${{ secrets.OPENROUTER_API_KEY }}
+          nvidia-api-key: ${{ secrets.NVIDIA_API_KEY }}
+          xai-api-key: ${{ secrets.XAI_API_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -4,6 +4,9 @@ Agentic PR reviewer powered by OpenCode. Drops into any repo with one workflow f
 
 ## Usage
 
+Copy [`examples/jbot-review.yml`](examples/jbot-review.yml) into
+`.github/workflows/jbot-review.yml`, or use this minimal version:
+
 ```yaml
 # .github/workflows/jbot-review.yml
 name: jbot-review
@@ -19,6 +22,7 @@ permissions:
   contents: read
   packages: read
   pull-requests: write
+  checks: read
 
 jobs:
   review:
@@ -28,7 +32,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: pgup-ai/jbot-review-action@v0   # latest v0.x.y
+      - uses: pgup-ai/jbot-review-action@v0 # latest v0.x.y
         with:
           provider: ${{ vars.JBOT_REVIEW_PROVIDER || 'opencode' }}
           model: ${{ vars.JBOT_REVIEW_MODEL || '' }}
@@ -44,24 +48,24 @@ jobs:
 
 ## Inputs
 
-| Input | Required | Default | Description |
-|---|---|---|---|
-| `provider` | No | `opencode` | LLM provider (opencode, deepseek, openai, anthropic, openrouter, nvidia, xai) |
-| `model` | No | Provider default | Model as `provider/model` |
-| `opencode-api-key` | No | — | Required when `provider=opencode` |
-| `deepseek-api-key` | No | — | Required when `provider=deepseek` |
-| `openai-api-key` | No | — | Required when `provider=openai` |
-| `anthropic-api-key` | No | — | Required when `provider=anthropic` |
-| `openrouter-api-key` | No | — | Required when `provider=openrouter` |
-| `nvidia-api-key` | No | — | Required when `provider=nvidia` |
-| `xai-api-key` | No | — | Required when `provider=xai` |
-| `github-token` | Yes | `${{ github.token }}` | Token for posting the review |
-| `pr-number` | No | — | PR number for manual `workflow_dispatch` runs |
-| `dry-run` | No | `false` | Log review output without posting comments |
-| `max-findings` | No | `0` | Maximum findings to post; `0` means no limit |
-| `min-severity` | No | `nit` | Minimum severity to include: `P0`, `P1`, `P2`, `P3`, or `nit` |
-| `include-prior-comments` | No | `true` | Include prior PR review comments in context |
-| `fail-on-error` | No | `true` | Fail the workflow when review cannot complete |
+| Input                    | Required | Default               | Description                                                                   |
+| ------------------------ | -------- | --------------------- | ----------------------------------------------------------------------------- |
+| `provider`               | No       | `opencode`            | LLM provider (opencode, deepseek, openai, anthropic, openrouter, nvidia, xai) |
+| `model`                  | No       | Provider default      | Model as `provider/model`                                                     |
+| `opencode-api-key`       | No       | —                     | Required when `provider=opencode`                                             |
+| `deepseek-api-key`       | No       | —                     | Required when `provider=deepseek`                                             |
+| `openai-api-key`         | No       | —                     | Required when `provider=openai`                                               |
+| `anthropic-api-key`      | No       | —                     | Required when `provider=anthropic`                                            |
+| `openrouter-api-key`     | No       | —                     | Required when `provider=openrouter`                                           |
+| `nvidia-api-key`         | No       | —                     | Required when `provider=nvidia`                                               |
+| `xai-api-key`            | No       | —                     | Required when `provider=xai`                                                  |
+| `github-token`           | Yes      | `${{ github.token }}` | Token for posting the review                                                  |
+| `pr-number`              | No       | —                     | PR number for manual `workflow_dispatch` runs                                 |
+| `dry-run`                | No       | `false`               | Log review output without posting comments                                    |
+| `max-findings`           | No       | `0`                   | Maximum findings to post; `0` means no limit                                  |
+| `min-severity`           | No       | `nit`                 | Minimum severity to include: `P0`, `P1`, `P2`, `P3`, or `nit`                 |
+| `include-prior-comments` | No       | `true`                | Include prior PR review comments in context                                   |
+| `fail-on-error`          | No       | `true`                | Fail the workflow when review cannot complete                                 |
 
 See [models.dev](https://models.dev/) for the full list of available models.
 Use repository or organization Actions variables `JBOT_REVIEW_PROVIDER` and
@@ -69,9 +73,9 @@ Use repository or organization Actions variables `JBOT_REVIEW_PROVIDER` and
 The action reads only the key matching the selected `provider`, so the example
 can pass multiple provider secrets and leave unused ones empty. It accepts
 provider and model from either action inputs or environment variables:
-`provider`, `JBOT_REVIEW_PROVIDER`, or `PROVIDER` for the provider, and `model`,
-`JBOT_REVIEW_MODEL`, or `MODEL` for the model. Provider API keys can also be
-supplied through their standard env vars, such as `OPENROUTER_API_KEY` or
+`provider` or `JBOT_REVIEW_PROVIDER` for the provider, and `model` or
+`JBOT_REVIEW_MODEL` for the model. Provider API keys can also be supplied
+through their standard env vars, such as `OPENROUTER_API_KEY` or
 `NVIDIA_API_KEY`. This convenience pattern exposes every configured provider key
 to the action runtime. For a least-privilege setup, pass only the selected
 provider's key:
