@@ -42,6 +42,8 @@ jobs:
           openrouter-api-key: ${{ secrets.OPENROUTER_API_KEY }}
           nvidia-api-key: ${{ secrets.NVIDIA_API_KEY }}
           xai-api-key: ${{ secrets.XAI_API_KEY }}
+          enable-context7: auto
+          context7-api-key: ${{ secrets.CONTEXT7_API_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           thread-resolution-token: ${{ secrets.JBOT_REVIEW_THREAD_RESOLUTION_TOKEN }}
 ```
@@ -59,6 +61,8 @@ jobs:
 | `openrouter-api-key`      | No       | —                     | Required when `provider=openrouter`                                                        |
 | `nvidia-api-key`          | No       | —                     | Required when `provider=nvidia`                                                            |
 | `xai-api-key`             | No       | —                     | Required when `provider=xai`                                                               |
+| `enable-context7`         | No       | `auto`                | Use Context7 MCP for external contract changes; `auto`, `true`, or `false`                 |
+| `context7-api-key`        | No       | —                     | Optional Context7 key for reliable CI docs lookup                                          |
 | `github-token`            | Yes      | `${{ github.token }}` | Token for posting the review                                                               |
 | `thread-resolution-token` | No       | —                     | Optional token used only to resolve addressed review threads                               |
 | `pr-number`               | No       | —                     | PR number for manual `workflow_dispatch` runs                                              |
@@ -88,6 +92,12 @@ with:
   opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
   github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+Set `enable-context7: auto` and pass `context7-api-key` from
+`secrets.CONTEXT7_API_KEY` to let the review agent verify current docs when the
+PR changes external API, SDK, framework, CLI, cloud-service, or GitHub Actions
+usage. Context7 is skipped for ordinary business-logic changes, and Context7
+MCP failures are non-blocking.
 
 When jbot verifies a prior finding is fixed, it posts an addressed reply and
 then attempts to resolve the GitHub review thread. Some `GITHUB_TOKEN`
