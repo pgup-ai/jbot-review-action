@@ -36,7 +36,6 @@ jobs:
           provider: ${{ vars.JBOT_REVIEW_PROVIDER || 'opencode' }}
           model: ${{ vars.JBOT_REVIEW_MODEL || '' }}
           opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
-          opencode-go-api-key: ${{ secrets.OPENCODE_GO_API_KEY }}
           deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -53,8 +52,7 @@ jobs:
 | ------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
 | `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, openrouter, nvidia, xai) |
 | `model`                   | No       | Provider default      | Model as `provider/model`                                                                  |
-| `opencode-api-key`        | No       | —                     | Required when `provider=opencode`                                                          |
-| `opencode-go-api-key`     | No       | —                     | Required when `provider=opencode-go`                                                       |
+| `opencode-api-key`        | No       | —                     | Required when `provider=opencode` or `provider=opencode-go`                                |
 | `deepseek-api-key`        | No       | —                     | Required when `provider=deepseek`                                                          |
 | `openai-api-key`          | No       | —                     | Required when `provider=openai`                                                            |
 | `anthropic-api-key`       | No       | —                     | Required when `provider=anthropic`                                                         |
@@ -79,9 +77,9 @@ provider and model from either action inputs or environment variables:
 `provider` or `JBOT_REVIEW_PROVIDER` for the provider, and `model` or
 `JBOT_REVIEW_MODEL` for the model. Provider API keys can also be supplied
 through their standard env vars, such as `OPENROUTER_API_KEY` or
-`NVIDIA_API_KEY`. This convenience pattern exposes every configured provider key
-to the action runtime. For a least-privilege setup, pass only the selected
-provider's key:
+`NVIDIA_API_KEY`. `opencode-go` uses the same `OPENCODE_API_KEY` as `opencode`.
+This convenience pattern exposes every configured provider key to the action
+runtime. For a least-privilege setup, pass only the selected provider's key:
 
 ```yaml
 with:

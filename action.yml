@@ -15,11 +15,7 @@ inputs:
     required: false
     default: ''
   opencode-api-key:
-    description: 'OpenCode API key. Required when provider=opencode.'
-    required: false
-    default: ''
-  opencode-go-api-key:
-    description: 'OpenCode Go API key. Required when provider=opencode-go.'
+    description: 'OpenCode API key. Required when provider=opencode or provider=opencode-go.'
     required: false
     default: ''
   deepseek-api-key:
@@ -88,7 +84,6 @@ runs:
     INPUT_PROVIDER: ${{ inputs.provider }}
     INPUT_MODEL: ${{ inputs.model }}
     INPUT_OPENCODE-API-KEY: ${{ inputs.opencode-api-key }}
-    INPUT_OPENCODE-GO-API-KEY: ${{ inputs.opencode-go-api-key }}
     INPUT_DEEPSEEK-API-KEY: ${{ inputs.deepseek-api-key }}
     INPUT_OPENAI-API-KEY: ${{ inputs.openai-api-key }}
     INPUT_ANTHROPIC-API-KEY: ${{ inputs.anthropic-api-key }}
