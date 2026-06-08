@@ -36,6 +36,7 @@ jobs:
           provider: ${{ vars.JBOT_REVIEW_PROVIDER || 'opencode' }}
           model: ${{ vars.JBOT_REVIEW_MODEL || '' }}
           opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
+          opencode-go-api-key: ${{ secrets.OPENCODE_GO_API_KEY }}
           deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -48,25 +49,26 @@ jobs:
 
 ## Inputs
 
-| Input                     | Required | Default               | Description                                                                   |
-| ------------------------- | -------- | --------------------- | ----------------------------------------------------------------------------- |
-| `provider`                | No       | `opencode`            | LLM provider (opencode, deepseek, openai, anthropic, openrouter, nvidia, xai) |
-| `model`                   | No       | Provider default      | Model as `provider/model`                                                     |
-| `opencode-api-key`        | No       | —                     | Required when `provider=opencode`                                             |
-| `deepseek-api-key`        | No       | —                     | Required when `provider=deepseek`                                             |
-| `openai-api-key`          | No       | —                     | Required when `provider=openai`                                               |
-| `anthropic-api-key`       | No       | —                     | Required when `provider=anthropic`                                            |
-| `openrouter-api-key`      | No       | —                     | Required when `provider=openrouter`                                           |
-| `nvidia-api-key`          | No       | —                     | Required when `provider=nvidia`                                               |
-| `xai-api-key`             | No       | —                     | Required when `provider=xai`                                                  |
-| `github-token`            | Yes      | `${{ github.token }}` | Token for posting the review                                                  |
-| `thread-resolution-token` | No       | —                     | Optional token used only to resolve addressed review threads                  |
-| `pr-number`               | No       | —                     | PR number for manual `workflow_dispatch` runs                                 |
-| `dry-run`                 | No       | `false`               | Log review output without posting comments                                    |
-| `max-findings`            | No       | `0`                   | Maximum findings to post; `0` means no limit                                  |
-| `min-severity`            | No       | `nit`                 | Minimum severity to include: `P0`, `P1`, `P2`, `P3`, or `nit`                 |
-| `include-prior-comments`  | No       | `true`                | Include prior PR review comments in context                                   |
-| `fail-on-error`           | No       | `true`                | Fail the workflow when review cannot complete                                 |
+| Input                     | Required | Default               | Description                                                                                |
+| ------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
+| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, openrouter, nvidia, xai) |
+| `model`                   | No       | Provider default      | Model as `provider/model`                                                                  |
+| `opencode-api-key`        | No       | —                     | Required when `provider=opencode`                                                          |
+| `opencode-go-api-key`     | No       | —                     | Required when `provider=opencode-go`                                                       |
+| `deepseek-api-key`        | No       | —                     | Required when `provider=deepseek`                                                          |
+| `openai-api-key`          | No       | —                     | Required when `provider=openai`                                                            |
+| `anthropic-api-key`       | No       | —                     | Required when `provider=anthropic`                                                         |
+| `openrouter-api-key`      | No       | —                     | Required when `provider=openrouter`                                                        |
+| `nvidia-api-key`          | No       | —                     | Required when `provider=nvidia`                                                            |
+| `xai-api-key`             | No       | —                     | Required when `provider=xai`                                                               |
+| `github-token`            | Yes      | `${{ github.token }}` | Token for posting the review                                                               |
+| `thread-resolution-token` | No       | —                     | Optional token used only to resolve addressed review threads                               |
+| `pr-number`               | No       | —                     | PR number for manual `workflow_dispatch` runs                                              |
+| `dry-run`                 | No       | `false`               | Log review output without posting comments                                                 |
+| `max-findings`            | No       | `0`                   | Maximum findings to post; `0` means no limit                                               |
+| `min-severity`            | No       | `nit`                 | Minimum severity to include: `P0`, `P1`, `P2`, `P3`, or `nit`                              |
+| `include-prior-comments`  | No       | `true`                | Include prior PR review comments in context                                                |
+| `fail-on-error`           | No       | `true`                | Fail the workflow when review cannot complete                                              |
 
 See [models.dev](https://models.dev/) for the full list of available models.
 Use repository or organization Actions variables `JBOT_REVIEW_PROVIDER` and
