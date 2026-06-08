@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha || format('refs/pull/{0}/merge', inputs['pr-number']) }}
+          ref: ${{ github.event.pull_request.head.sha || format('refs/pull/{0}/head', inputs['pr-number']) }}
 
       - uses: pgup-ai/jbot-review-action@v0
         with:
