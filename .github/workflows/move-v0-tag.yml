@@ -1,0 +1,37 @@
+name: Move v0 Tag
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  move-v0:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Move v0 to current commit
+        run: |
+          set -euo pipefail
+
+          git fetch --force origin 'refs/tags/v0:refs/tags/v0' || true
+
+          current_sha="$(git rev-parse HEAD)"
+          tag_sha="$(git rev-parse refs/tags/v0 2>/dev/null || true)"
+
+          if [ "$current_sha" = "$tag_sha" ]; then
+            echo "v0 already points to $current_sha"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f v0 "$current_sha"
+          git push origin refs/tags/v0 --force
