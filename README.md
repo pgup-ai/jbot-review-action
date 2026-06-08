@@ -43,28 +43,30 @@ jobs:
           nvidia-api-key: ${{ secrets.NVIDIA_API_KEY }}
           xai-api-key: ${{ secrets.XAI_API_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          thread-resolution-token: ${{ secrets.JBOT_REVIEW_THREAD_RESOLUTION_TOKEN }}
 ```
 
 ## Inputs
 
-| Input                    | Required | Default               | Description                                                                   |
-| ------------------------ | -------- | --------------------- | ----------------------------------------------------------------------------- |
-| `provider`               | No       | `opencode`            | LLM provider (opencode, deepseek, openai, anthropic, openrouter, nvidia, xai) |
-| `model`                  | No       | Provider default      | Model as `provider/model`                                                     |
-| `opencode-api-key`       | No       | —                     | Required when `provider=opencode`                                             |
-| `deepseek-api-key`       | No       | —                     | Required when `provider=deepseek`                                             |
-| `openai-api-key`         | No       | —                     | Required when `provider=openai`                                               |
-| `anthropic-api-key`      | No       | —                     | Required when `provider=anthropic`                                            |
-| `openrouter-api-key`     | No       | —                     | Required when `provider=openrouter`                                           |
-| `nvidia-api-key`         | No       | —                     | Required when `provider=nvidia`                                               |
-| `xai-api-key`            | No       | —                     | Required when `provider=xai`                                                  |
-| `github-token`           | Yes      | `${{ github.token }}` | Token for posting the review                                                  |
-| `pr-number`              | No       | —                     | PR number for manual `workflow_dispatch` runs                                 |
-| `dry-run`                | No       | `false`               | Log review output without posting comments                                    |
-| `max-findings`           | No       | `0`                   | Maximum findings to post; `0` means no limit                                  |
-| `min-severity`           | No       | `nit`                 | Minimum severity to include: `P0`, `P1`, `P2`, `P3`, or `nit`                 |
-| `include-prior-comments` | No       | `true`                | Include prior PR review comments in context                                   |
-| `fail-on-error`          | No       | `true`                | Fail the workflow when review cannot complete                                 |
+| Input                     | Required | Default               | Description                                                                   |
+| ------------------------- | -------- | --------------------- | ----------------------------------------------------------------------------- |
+| `provider`                | No       | `opencode`            | LLM provider (opencode, deepseek, openai, anthropic, openrouter, nvidia, xai) |
+| `model`                   | No       | Provider default      | Model as `provider/model`                                                     |
+| `opencode-api-key`        | No       | —                     | Required when `provider=opencode`                                             |
+| `deepseek-api-key`        | No       | —                     | Required when `provider=deepseek`                                             |
+| `openai-api-key`          | No       | —                     | Required when `provider=openai`                                               |
+| `anthropic-api-key`       | No       | —                     | Required when `provider=anthropic`                                            |
+| `openrouter-api-key`      | No       | —                     | Required when `provider=openrouter`                                           |
+| `nvidia-api-key`          | No       | —                     | Required when `provider=nvidia`                                               |
+| `xai-api-key`             | No       | —                     | Required when `provider=xai`                                                  |
+| `github-token`            | Yes      | `${{ github.token }}` | Token for posting the review                                                  |
+| `thread-resolution-token` | No       | —                     | Optional token used only to resolve addressed review threads                  |
+| `pr-number`               | No       | —                     | PR number for manual `workflow_dispatch` runs                                 |
+| `dry-run`                 | No       | `false`               | Log review output without posting comments                                    |
+| `max-findings`            | No       | `0`                   | Maximum findings to post; `0` means no limit                                  |
+| `min-severity`            | No       | `nit`                 | Minimum severity to include: `P0`, `P1`, `P2`, `P3`, or `nit`                 |
+| `include-prior-comments`  | No       | `true`                | Include prior PR review comments in context                                   |
+| `fail-on-error`           | No       | `true`                | Fail the workflow when review cannot complete                                 |
 
 See [models.dev](https://models.dev/) for the full list of available models.
 Use repository or organization Actions variables `JBOT_REVIEW_PROVIDER` and
@@ -86,6 +88,14 @@ with:
   opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
   github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+When jbot verifies a prior finding is fixed, it posts an addressed reply and
+then attempts to resolve the GitHub review thread. Some `GITHUB_TOKEN`
+integrations can post review comments but cannot run GitHub's
+`resolveReviewThread` mutation. If you see `Resource not accessible by
+integration` in the logs, add a secret such as
+`JBOT_REVIEW_THREAD_RESOLUTION_TOKEN` with a PAT or GitHub App token that can
+resolve PR review threads, then pass it through `thread-resolution-token`.
 
 If `model` is set, its `provider/model` prefix must match the selected
 `provider`.

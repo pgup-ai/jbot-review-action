@@ -54,3 +54,4 @@ jobs:
           nvidia-api-key: ${{ secrets.NVIDIA_API_KEY }}
           xai-api-key: ${{ secrets.XAI_API_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          thread-resolution-token: ${{ secrets.JBOT_REVIEW_THREAD_RESOLUTION_TOKEN }}
