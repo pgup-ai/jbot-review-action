@@ -20,7 +20,6 @@ concurrency:
 
 permissions:
   contents: read
-  packages: read
   pull-requests: write
   checks: read
 
