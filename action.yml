@@ -7,8 +7,9 @@ branding:
 
 inputs:
   provider:
-    description: 'LLM provider (defaults to opencode).'
-    default: 'opencode'
+    description: 'LLM provider. Defaults to opencode when unset.'
+    required: false
+    default: ''
   model:
     description: 'Model as provider/model. Uses provider default if unset.'
     required: false
@@ -31,6 +32,10 @@ inputs:
     default: ''
   openrouter-api-key:
     description: 'OpenRouter API key. Required when provider=openrouter.'
+    required: false
+    default: ''
+  nvidia-api-key:
+    description: 'NVIDIA API key. Required when provider=nvidia.'
     required: false
     default: ''
   xai-api-key:
@@ -79,6 +84,7 @@ runs:
     INPUT_OPENAI-API-KEY: ${{ inputs.openai-api-key }}
     INPUT_ANTHROPIC-API-KEY: ${{ inputs.anthropic-api-key }}
     INPUT_OPENROUTER-API-KEY: ${{ inputs.openrouter-api-key }}
+    INPUT_NVIDIA-API-KEY: ${{ inputs.nvidia-api-key }}
     INPUT_XAI-API-KEY: ${{ inputs.xai-api-key }}
     INPUT_GITHUB-TOKEN: ${{ inputs.github-token }}
     INPUT_PR-NUMBER: ${{ inputs.pr-number }}
