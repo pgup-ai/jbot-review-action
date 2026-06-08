@@ -15,7 +15,7 @@ inputs:
     required: false
     default: ''
   opencode-api-key:
-    description: 'OpenCode API key. Required when provider=opencode.'
+    description: 'OpenCode API key. Required when provider=opencode or provider=opencode-go.'
     required: false
     default: ''
   deepseek-api-key:
