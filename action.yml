@@ -42,6 +42,14 @@ inputs:
     description: 'xAI API key. Required when provider=xai.'
     required: false
     default: ''
+  enable-context7:
+    description: 'Enable Context7 MCP documentation lookup for external API/SDK/framework/workflow changes. Use auto, true, or false.'
+    required: false
+    default: 'auto'
+  context7-api-key:
+    description: 'Optional Context7 API key for reliable MCP documentation lookup in CI.'
+    required: false
+    default: ''
   github-token:
     description: 'Token to read the PR and post the review.'
     required: true
@@ -90,6 +98,8 @@ runs:
     INPUT_OPENROUTER-API-KEY: ${{ inputs.openrouter-api-key }}
     INPUT_NVIDIA-API-KEY: ${{ inputs.nvidia-api-key }}
     INPUT_XAI-API-KEY: ${{ inputs.xai-api-key }}
+    INPUT_ENABLE-CONTEXT7: ${{ inputs.enable-context7 }}
+    INPUT_CONTEXT7-API-KEY: ${{ inputs.context7-api-key }}
     INPUT_GITHUB-TOKEN: ${{ inputs.github-token }}
     INPUT_THREAD-RESOLUTION-TOKEN: ${{ inputs.thread-resolution-token }}
     INPUT_PR-NUMBER: ${{ inputs.pr-number }}
