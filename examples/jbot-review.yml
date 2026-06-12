@@ -1,4 +1,4 @@
-name: jbot-review
+name: J-Bot Code Review
 
 on:
   pull_request:
@@ -9,17 +9,17 @@ on:
         description: Pull request number to review
         required: true
       provider:
-        description: "LLM provider. Uses JBOT_REVIEW_PROVIDER or opencode if unset."
+        description: 'LLM provider. Uses JBOT_REVIEW_PROVIDER or opencode if unset.'
         required: false
-        default: ""
+        default: ''
       model:
-        description: "Model as provider/model. Uses provider default if unset."
+        description: 'Provider model id, optionally prefixed as provider/model. Uses provider default if unset.'
         required: false
-        default: ""
+        default: ''
       dry-run:
         description: Log review output without posting to GitHub
         required: false
-        default: "false"
+        default: 'false'
 
 concurrency:
   group: jbot-review-${{ github.event.pull_request.number || inputs['pr-number'] || github.run_id }}
@@ -35,7 +35,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha || format('refs/pull/{0}/head', inputs['pr-number']) }}
@@ -55,5 +55,12 @@ jobs:
           xai-api-key: ${{ secrets.XAI_API_KEY }}
           enable-context7: auto
           context7-api-key: ${{ secrets.CONTEXT7_API_KEY }}
+          # Recall/precision controls (defaults shown): one general pass,
+          # blocking findings adversarially verified before posting. Set
+          # aux-model to run the auxiliary sessions on a cheaper same-provider
+          # model when the main model is a stronger tier.
+          review-passes: '1'
+          verify-findings: 'true'
+          aux-model: ${{ vars.JBOT_REVIEW_AUX_MODEL || '' }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           thread-resolution-token: ${{ secrets.JBOT_REVIEW_THREAD_RESOLUTION_TOKEN }}

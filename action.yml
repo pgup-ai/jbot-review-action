@@ -1,4 +1,4 @@
-name: 'jbot-review'
+name: 'J-Bot Code Review'
 description: 'Agentic PR review via opencode serve + SDK, with gated inline posting.'
 
 branding:
@@ -11,7 +11,7 @@ inputs:
     required: false
     default: ''
   model:
-    description: 'Model as provider/model. Uses provider default if unset.'
+    description: 'Provider model id, optionally prefixed as provider/model. Uses provider default if unset.'
     required: false
     default: ''
   opencode-api-key:
@@ -78,6 +78,38 @@ inputs:
     description: 'Include prior PR review comments in the review context.'
     required: false
     default: 'true'
+  enable-guideline-pass:
+    description: 'Run a dedicated guideline-compliance review session when repository guidelines are discovered.'
+    required: false
+    default: 'true'
+  aux-model:
+    description: 'Model for auxiliary sessions (addressed-thread check, guideline compliance, finding verification). Must be on the same provider as the main model. Uses the main model when unset.'
+    required: false
+    default: ''
+  review-passes:
+    description: 'Total review passes (1-3). Passes beyond the first add focused recall lenses (interactions, then integrity) in parallel on the aux model; findings are merged and deduped. Each extra pass costs roughly one extra model session — cheap on paid tiers, but adds queue time on throttled free tiers. Default 1; raise to 2-3 for maximum recall.'
+    required: false
+    default: '1'
+  verify-findings:
+    description: 'Adversarially verify blocking findings in a dedicated session before posting: refuted findings are dropped, uncertain ones demoted to advisory.'
+    required: false
+    default: 'true'
+  time-budget-minutes:
+    description: 'Wall-clock target in minutes (0 = no budget). Derives per-session timeouts; a session over its share degrades that session (fail-open) instead of failing the run.'
+    required: false
+    default: '10'
+  review-shards:
+    description: 'Parallel shards for the main review (0 = auto from diff size, capped at 4). Each shard deep-reviews a subset of files; the union covers the full diff and wall clock tracks the slowest shard.'
+    required: false
+    default: '0'
+  model-options:
+    description: 'JSON object of provider options for the main model. Defaults to {"reasoningEffort":"medium"} — a balance of depth and latency; raise to high for paid heavy tiers, or pass {} to send no options (e.g. for providers that reject unknown options). Aux-model sessions are unaffected.'
+    required: false
+    default: '{"reasoningEffort":"medium"}'
+  max-concurrent-sessions:
+    description: 'Max model sessions in flight at once (0 = unlimited). Throttled provider tiers serialize concurrent requests on one key upstream; capping on our side keeps session deadlines measuring model time, not queue time. Try 2-3 on free tiers.'
+    required: false
+    default: '0'
   fail-on-error:
     description: 'Fail the workflow when the review cannot complete.'
     required: false
@@ -107,4 +139,12 @@ runs:
     INPUT_MAX-FINDINGS: ${{ inputs.max-findings }}
     INPUT_MIN-SEVERITY: ${{ inputs.min-severity }}
     INPUT_INCLUDE-PRIOR-COMMENTS: ${{ inputs.include-prior-comments }}
+    INPUT_ENABLE-GUIDELINE-PASS: ${{ inputs.enable-guideline-pass }}
+    INPUT_AUX-MODEL: ${{ inputs.aux-model }}
+    INPUT_REVIEW-PASSES: ${{ inputs.review-passes }}
+    INPUT_VERIFY-FINDINGS: ${{ inputs.verify-findings }}
+    INPUT_TIME-BUDGET-MINUTES: ${{ inputs.time-budget-minutes }}
+    INPUT_REVIEW-SHARDS: ${{ inputs.review-shards }}
+    INPUT_MODEL-OPTIONS: ${{ inputs.model-options }}
+    INPUT_MAX-CONCURRENT-SESSIONS: ${{ inputs.max-concurrent-sessions }}
     INPUT_FAIL-ON-ERROR: ${{ inputs.fail-on-error }}
