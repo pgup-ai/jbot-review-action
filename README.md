@@ -9,7 +9,7 @@ Copy [`examples/jbot-review.yml`](examples/jbot-review.yml) into
 
 ```yaml
 # .github/workflows/jbot-review.yml
-name: jbot-review
+name: J-Bot Code Review
 on:
   pull_request:
     types: [opened, reopened, ready_for_review, synchronize]
@@ -28,7 +28,7 @@ jobs:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: pgup-ai/jbot-review-action@v0 # latest v0.x.y
@@ -44,6 +44,13 @@ jobs:
           xai-api-key: ${{ secrets.XAI_API_KEY }}
           enable-context7: auto
           context7-api-key: ${{ secrets.CONTEXT7_API_KEY }}
+          # Recall/precision controls (defaults shown): one general pass,
+          # blocking findings adversarially verified before posting. Set
+          # aux-model to run the auxiliary sessions on a cheaper same-provider
+          # model when the main model is a stronger tier.
+          review-passes: '1'
+          verify-findings: 'true'
+          aux-model: ${{ vars.JBOT_REVIEW_AUX_MODEL || '' }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           thread-resolution-token: ${{ secrets.JBOT_REVIEW_THREAD_RESOLUTION_TOKEN }}
 ```
@@ -53,7 +60,7 @@ jobs:
 | Input                     | Required | Default               | Description                                                                                |
 | ------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
 | `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, openrouter, nvidia, xai) |
-| `model`                   | No       | Provider default      | Model as `provider/model`                                                                  |
+| `model`                   | No       | Provider default      | Provider model id, optionally prefixed as `provider/model`                                 |
 | `opencode-api-key`        | No       | —                     | Required when `provider=opencode` or `provider=opencode-go`                                |
 | `deepseek-api-key`        | No       | —                     | Required when `provider=deepseek`                                                          |
 | `openai-api-key`          | No       | —                     | Required when `provider=openai`                                                            |
@@ -70,6 +77,14 @@ jobs:
 | `max-findings`            | No       | `0`                   | Maximum findings to post; `0` means no limit                                               |
 | `min-severity`            | No       | `nit`                 | Minimum severity to include: `P0`, `P1`, `P2`, `P3`, or `nit`                              |
 | `include-prior-comments`  | No       | `true`                | Include prior PR review comments in context                                                |
+| `enable-guideline-pass`   | No       | `true`                | Run a dedicated guideline-compliance pass when repository guidelines are discovered         |
+| `aux-model`               | No       | —                     | Same-provider model for auxiliary sessions; uses the main model when unset                 |
+| `review-passes`           | No       | `1`                   | Total review passes, 1-3. Raise to 2-3 for extra recall lenses                             |
+| `verify-findings`         | No       | `true`                | Re-check blocking findings before posting; uncertain findings become advisory              |
+| `time-budget-minutes`     | No       | `10`                  | Wall-clock target in minutes; `0` disables budget-derived session timeouts                 |
+| `review-shards`           | No       | `0`                   | Parallel main-review shards; `0` auto-scales by diff size, capped at 4                     |
+| `model-options`           | No       | `{"reasoningEffort":"medium"}` | JSON provider options for the main model; pass `{}` to send none                  |
+| `max-concurrent-sessions` | No       | `0`                   | Max model sessions in flight; `0` means unlimited                                          |
 | `fail-on-error`           | No       | `true`                | Fail the workflow when review cannot complete                                              |
 
 See [models.dev](https://models.dev/) for the full list of available models.
@@ -107,8 +122,9 @@ integration` in the logs, add a secret such as
 `JBOT_REVIEW_THREAD_RESOLUTION_TOKEN` with a PAT or GitHub App token that can
 resolve PR review threads, then pass it through `thread-resolution-token`.
 
-If `model` is set, its `provider/model` prefix must match the selected
-`provider`.
+If `model` or `aux-model` is prefixed as `provider/model`, that prefix must
+match the selected `provider`; bare model ids are resolved against the selected
+provider.
 
 Migrating from `api-key`: replace the old unified `api-key` input with the
 matching provider-specific input, such as `opencode-api-key` for
