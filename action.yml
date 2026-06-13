@@ -97,7 +97,7 @@ inputs:
   time-budget-minutes:
     description: 'Wall-clock target in minutes (0 = no budget). Derives per-session timeouts; a session over its share degrades that session (fail-open) instead of failing the run.'
     required: false
-    default: '10'
+    default: '30'
   review-shards:
     description: 'Parallel shards for the main review (0 = auto from diff size, capped at 4). Each shard deep-reviews a subset of files; the union covers the full diff and wall clock tracks the slowest shard.'
     required: false
