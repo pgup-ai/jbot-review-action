@@ -95,7 +95,7 @@ inputs:
     required: false
     default: 'true'
   time-budget-minutes:
-    description: 'Wall-clock target in minutes (0 = no budget). Derives per-session timeouts; a session over its share degrades that session (fail-open) instead of failing the run.'
+    description: 'Wall-clock target in minutes (0 = no budget). Derives per-session timeouts; an auxiliary session over its share fails open (degrades only itself), while a main review shard that still fails after its retry aborts the run rather than posting partial coverage.'
     required: false
     default: '30'
   review-shards:
