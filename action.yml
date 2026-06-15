@@ -99,9 +99,9 @@ inputs:
     required: false
     default: '30'
   review-shards:
-    description: 'Parallel shards for the main review (0 = auto from diff size, capped at 4). Each shard deep-reviews a subset of files; the union covers the full diff and wall clock tracks the slowest shard.'
+    description: 'Parallel shards for the main review. 1 = no sharding, one full-diff session (default). 0 = auto from diff size, capped at 4. N = pin N shards. Sharding only speeds up review on providers that serve concurrent sessions; on free/throttled tiers the shards serialize on one API key, so 1 is the better default. Either way the review covers the complete diff. Raise it (and pair with max-concurrent-sessions) only on paid tiers with real concurrency, or for very large PRs where smaller per-shard context helps depth.'
     required: false
-    default: '0'
+    default: '1'
   model-options:
     description: 'JSON object of provider options for the main model. Defaults to {"reasoningEffort":"medium"} — a balance of depth and latency; raise to high for paid heavy tiers, or pass {} to send no options (e.g. for providers that reject unknown options). Aux-model sessions are unaffected.'
     required: false
