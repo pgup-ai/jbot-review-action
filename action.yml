@@ -106,6 +106,10 @@ inputs:
     description: 'JSON object of provider options for the main model. Defaults to {"reasoningEffort":"medium"} — a balance of depth and latency; raise to high for paid heavy tiers, or pass {} to send no options (e.g. for providers that reject unknown options). Aux-model sessions are unaffected.'
     required: false
     default: '{"reasoningEffort":"medium"}'
+  prompt-cache:
+    description: 'Enable opencode prompt caching (provider setCacheKey). Parallel shards and re-reviews share an identical prompt prefix, so caching cuts input-token cost on providers that honor it and is a no-op elsewhere. Per-session cache hits are logged.'
+    required: false
+    default: 'true'
   max-concurrent-sessions:
     description: 'Max model sessions in flight at once (0 = unlimited). Throttled provider tiers serialize concurrent requests on one key upstream; capping on our side keeps session deadlines measuring model time, not queue time. Try 2-3 on free tiers.'
     required: false
@@ -146,5 +150,6 @@ runs:
     INPUT_TIME-BUDGET-MINUTES: ${{ inputs.time-budget-minutes }}
     INPUT_REVIEW-SHARDS: ${{ inputs.review-shards }}
     INPUT_MODEL-OPTIONS: ${{ inputs.model-options }}
+    INPUT_PROMPT-CACHE: ${{ inputs.prompt-cache }}
     INPUT_MAX-CONCURRENT-SESSIONS: ${{ inputs.max-concurrent-sessions }}
     INPUT_FAIL-ON-ERROR: ${{ inputs.fail-on-error }}
