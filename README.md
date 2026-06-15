@@ -82,7 +82,7 @@ jobs:
 | `review-passes`           | No       | `1`                   | Total review passes, 1-3. Raise to 2-3 for extra recall lenses                             |
 | `verify-findings`         | No       | `true`                | Re-check blocking findings before posting; uncertain findings become advisory              |
 | `time-budget-minutes`     | No       | `30`                  | Wall-clock target in minutes; `0` disables budget-derived session timeouts                 |
-| `review-shards`           | No       | `0`                   | Parallel main-review shards; `0` auto-scales by diff size, capped at 4                     |
+| `review-shards`           | No       | `1`                   | Parallel main-review shards. `1` = single full-diff session (default); `0` auto-scales by diff size, capped at 4. Only speeds up on providers with real session concurrency; free/throttled tiers serialize shards on one key |
 | `model-options`           | No       | `{"reasoningEffort":"medium"}` | JSON provider options for the main model; pass `{}` to send none                  |
 | `max-concurrent-sessions` | No       | `0`                   | Max model sessions in flight; `0` means unlimited                                          |
 | `fail-on-error`           | No       | `true`                | Fail the workflow when review cannot complete                                              |
