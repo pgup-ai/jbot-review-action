@@ -3,7 +3,7 @@ description: 'Agentic PR review via opencode serve + SDK, with gated inline post
 
 branding:
   icon: 'git-pull-request'
-  color: 'purple'
+  color: 'green'
 
 inputs:
   provider:
