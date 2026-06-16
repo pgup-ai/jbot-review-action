@@ -110,6 +110,10 @@ inputs:
     description: 'Enable opencode prompt caching (provider setCacheKey). Parallel shards and re-reviews share an identical prompt prefix, so caching cuts input-token cost on providers that honor it and is a no-op elsewhere. Per-session cache hits are logged.'
     required: false
     default: 'true'
+  skip-doc-only:
+    description: 'Skip the full LLM review when a PR changes only documentation, prose, or diagram assets (.md, .mdx, .markdown, .rst, .adoc, .txt, .pdf, .svg, .drawio, .dio, .excalidraw, .mmd, .puml, .plantuml). The reaction is left unchanged (a docs push does not change the verdict, so a prior clean reaction stays and an open-findings PR stays reaction-less); a single code/config file forces a full review. Deterministic, no model call.'
+    required: false
+    default: 'true'
   max-concurrent-sessions:
     description: 'Max model sessions in flight at once (0 = unlimited). Throttled provider tiers serialize concurrent requests on one key upstream; capping on our side keeps session deadlines measuring model time, not queue time. Try 2-3 on free tiers.'
     required: false
@@ -151,5 +155,6 @@ runs:
     INPUT_REVIEW-SHARDS: ${{ inputs.review-shards }}
     INPUT_MODEL-OPTIONS: ${{ inputs.model-options }}
     INPUT_PROMPT-CACHE: ${{ inputs.prompt-cache }}
+    INPUT_SKIP-DOC-ONLY: ${{ inputs.skip-doc-only }}
     INPUT_MAX-CONCURRENT-SESSIONS: ${{ inputs.max-concurrent-sessions }}
     INPUT_FAIL-ON-ERROR: ${{ inputs.fail-on-error }}
