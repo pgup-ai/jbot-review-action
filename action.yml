@@ -83,7 +83,11 @@ inputs:
     required: false
     default: 'true'
   aux-model:
-    description: 'Model for auxiliary sessions (addressed-thread check, guideline compliance, finding verification). Must be on the same provider as the main model. Uses the main model when unset.'
+    description: 'Model for auxiliary sessions (addressed-thread check, guideline compliance, finding verification). Uses the main model when unset.'
+    required: false
+    default: ''
+  aux-provider:
+    description: 'Provider for auxiliary sessions. Uses the main provider when unset.'
     required: false
     default: ''
   review-passes:
@@ -149,6 +153,7 @@ runs:
     INPUT_INCLUDE-PRIOR-COMMENTS: ${{ inputs.include-prior-comments }}
     INPUT_ENABLE-GUIDELINE-PASS: ${{ inputs.enable-guideline-pass }}
     INPUT_AUX-MODEL: ${{ inputs.aux-model }}
+    INPUT_AUX-PROVIDER: ${{ inputs.aux-provider }}
     INPUT_REVIEW-PASSES: ${{ inputs.review-passes }}
     INPUT_VERIFY-FINDINGS: ${{ inputs.verify-findings }}
     INPUT_TIME-BUDGET-MINUTES: ${{ inputs.time-budget-minutes }}

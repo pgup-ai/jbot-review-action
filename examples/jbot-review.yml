@@ -58,10 +58,11 @@ jobs:
           context7-api-key: ${{ secrets.CONTEXT7_API_KEY }}
           # Recall/precision controls (defaults shown): one general pass,
           # blocking findings adversarially verified before posting. Set
-          # aux-model to run the auxiliary sessions on a cheaper same-provider
-          # model when the main model is a stronger tier.
+          # aux-provider + aux-model can run auxiliary sessions on a cheaper
+          # provider/model when the main model is a stronger tier.
           review-passes: '1'
           verify-findings: 'true'
+          aux-provider: ${{ vars.JBOT_AUX_PROVIDER || '' }}
           aux-model: ${{ vars.JBOT_REVIEW_AUX_MODEL || '' }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           thread-resolution-token: ${{ secrets.JBOT_REVIEW_THREAD_RESOLUTION_TOKEN }}
