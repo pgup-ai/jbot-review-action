@@ -30,12 +30,20 @@ inputs:
     description: 'Anthropic API key. Used when provider or aux-provider is anthropic.'
     required: false
     default: ''
+  gemini-api-key:
+    description: 'Gemini API key. Used when provider or aux-provider is google.'
+    required: false
+    default: ''
   openrouter-api-key:
     description: 'OpenRouter API key. Used when provider or aux-provider is openrouter.'
     required: false
     default: ''
   nvidia-api-key:
     description: 'NVIDIA API key. Used when provider or aux-provider is nvidia.'
+    required: false
+    default: ''
+  zai-api-key:
+    description: 'Z.AI API key. Used when provider or aux-provider is zai-coding-plan.'
     required: false
     default: ''
   xai-api-key:
@@ -111,7 +119,7 @@ inputs:
     required: false
     default: '{"reasoningEffort":"medium"}'
   prompt-cache:
-    description: 'Enable opencode prompt caching (provider setCacheKey). Parallel shards and re-reviews share an identical prompt prefix, so caching cuts input-token cost on providers that honor it and is a no-op elsewhere. Per-session cache hits are logged.'
+    description: 'Enable opencode prompt caching (provider setCacheKey). Parallel shards and re-reviews share an identical prompt prefix, so caching cuts input-token cost on models that honor it; models marked unsupported omit the cache key. Per-session cache hits are logged.'
     required: false
     default: 'true'
   skip-doc-only:
@@ -139,8 +147,10 @@ runs:
     INPUT_DEEPSEEK-API-KEY: ${{ inputs.deepseek-api-key }}
     INPUT_OPENAI-API-KEY: ${{ inputs.openai-api-key }}
     INPUT_ANTHROPIC-API-KEY: ${{ inputs.anthropic-api-key }}
+    INPUT_GEMINI-API-KEY: ${{ inputs.gemini-api-key }}
     INPUT_OPENROUTER-API-KEY: ${{ inputs.openrouter-api-key }}
     INPUT_NVIDIA-API-KEY: ${{ inputs.nvidia-api-key }}
+    INPUT_ZAI-API-KEY: ${{ inputs.zai-api-key }}
     INPUT_XAI-API-KEY: ${{ inputs.xai-api-key }}
     INPUT_ENABLE-CONTEXT7: ${{ inputs.enable-context7 }}
     INPUT_CONTEXT7-API-KEY: ${{ inputs.context7-api-key }}
