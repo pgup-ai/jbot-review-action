@@ -119,7 +119,7 @@ inputs:
     required: false
     default: '{"reasoningEffort":"medium"}'
   prompt-cache:
-    description: 'Enable opencode prompt caching (provider setCacheKey). Parallel shards and re-reviews share an identical prompt prefix, so caching cuts input-token cost on providers that honor it and is a no-op elsewhere. Per-session cache hits are logged.'
+    description: 'Enable opencode prompt caching (provider setCacheKey). Parallel shards and re-reviews share an identical prompt prefix, so caching cuts input-token cost on models that honor it; models marked unsupported omit the cache key. Per-session cache hits are logged.'
     required: false
     default: 'true'
   skip-doc-only:
