@@ -15,31 +15,31 @@ inputs:
     required: false
     default: ''
   opencode-api-key:
-    description: 'OpenCode API key. Required when provider=opencode or provider=opencode-go.'
+    description: 'OpenCode API key. Used when provider or aux-provider is opencode/opencode-go.'
     required: false
     default: ''
   deepseek-api-key:
-    description: 'DeepSeek API key. Required when provider=deepseek.'
+    description: 'DeepSeek API key. Used when provider or aux-provider is deepseek.'
     required: false
     default: ''
   openai-api-key:
-    description: 'OpenAI API key. Required when provider=openai.'
+    description: 'OpenAI API key. Used when provider or aux-provider is openai.'
     required: false
     default: ''
   anthropic-api-key:
-    description: 'Anthropic API key. Required when provider=anthropic.'
+    description: 'Anthropic API key. Used when provider or aux-provider is anthropic.'
     required: false
     default: ''
   openrouter-api-key:
-    description: 'OpenRouter API key. Required when provider=openrouter.'
+    description: 'OpenRouter API key. Used when provider or aux-provider is openrouter.'
     required: false
     default: ''
   nvidia-api-key:
-    description: 'NVIDIA API key. Required when provider=nvidia.'
+    description: 'NVIDIA API key. Used when provider or aux-provider is nvidia.'
     required: false
     default: ''
   xai-api-key:
-    description: 'xAI API key. Required when provider=xai.'
+    description: 'xAI API key. Used when provider or aux-provider is xai.'
     required: false
     default: ''
   enable-context7:

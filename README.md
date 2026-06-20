@@ -63,13 +63,13 @@ jobs:
 | ------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
 | `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, openrouter, nvidia, xai) |
 | `model`                   | No       | Provider default      | Provider model id, optionally prefixed as `provider/model`                                 |
-| `opencode-api-key`        | No       | —                     | Required when `provider=opencode` or `provider=opencode-go`                                |
-| `deepseek-api-key`        | No       | —                     | Required when `provider=deepseek`                                                          |
-| `openai-api-key`          | No       | —                     | Required when `provider=openai`                                                            |
-| `anthropic-api-key`       | No       | —                     | Required when `provider=anthropic`                                                         |
-| `openrouter-api-key`      | No       | —                     | Required when `provider=openrouter`                                                        |
-| `nvidia-api-key`          | No       | —                     | Required when `provider=nvidia`                                                            |
-| `xai-api-key`             | No       | —                     | Required when `provider=xai`                                                               |
+| `opencode-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `opencode`/`opencode-go`                         |
+| `deepseek-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `deepseek`                                       |
+| `openai-api-key`          | No       | —                     | Used when `provider` or `aux-provider` is `openai`                                         |
+| `anthropic-api-key`       | No       | —                     | Used when `provider` or `aux-provider` is `anthropic`                                      |
+| `openrouter-api-key`      | No       | —                     | Used when `provider` or `aux-provider` is `openrouter`                                     |
+| `nvidia-api-key`          | No       | —                     | Used when `provider` or `aux-provider` is `nvidia`                                         |
+| `xai-api-key`             | No       | —                     | Used when `provider` or `aux-provider` is `xai`                                            |
 | `enable-context7`         | No       | `auto`                | Use Context7 MCP for external contract changes; `auto`, `true`, or `false`                 |
 | `context7-api-key`        | No       | —                     | Optional Context7 key for reliable CI docs lookup                                          |
 | `github-token`            | Yes      | `${{ github.token }}` | Token for posting the review                                                               |
@@ -133,8 +133,9 @@ integration` in the logs, add a secret such as
 `JBOT_REVIEW_THREAD_RESOLUTION_TOKEN` with a PAT or GitHub App token that can
 resolve PR review threads, then pass it through `thread-resolution-token`.
 
-If an aux-provider key is supplied, jbot uses it for auxiliary sessions. If it
-is not supplied, jbot reuses the review provider's key.
+If the selected aux provider's normal key input or env var is supplied, jbot
+uses it for auxiliary sessions. If it is not supplied, jbot reuses the review
+provider's key.
 
 If `model` is prefixed as `provider/model`, that prefix must match the selected
 `provider`. If `aux-model` is prefixed as `provider/model`, that prefix must
