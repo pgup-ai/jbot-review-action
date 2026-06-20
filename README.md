@@ -40,6 +40,7 @@ jobs:
           deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
           openrouter-api-key: ${{ secrets.OPENROUTER_API_KEY }}
           nvidia-api-key: ${{ secrets.NVIDIA_API_KEY }}
           zai-api-key: ${{ secrets.ZAI_API_KEY }}
@@ -62,12 +63,13 @@ jobs:
 
 | Input                     | Required | Default               | Description                                                                                |
 | ------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
-| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, openrouter, nvidia, zai-coding-plan, xai) |
+| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, google, openrouter, nvidia, zai-coding-plan, xai) |
 | `model`                   | No       | Provider default      | Provider model id, optionally prefixed as `provider/model`                                 |
 | `opencode-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `opencode`/`opencode-go`                         |
 | `deepseek-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `deepseek`                                       |
 | `openai-api-key`          | No       | —                     | Used when `provider` or `aux-provider` is `openai`                                         |
 | `anthropic-api-key`       | No       | —                     | Used when `provider` or `aux-provider` is `anthropic`                                      |
+| `gemini-api-key`          | No       | —                     | Used when `provider` or `aux-provider` is `google`                                         |
 | `openrouter-api-key`      | No       | —                     | Used when `provider` or `aux-provider` is `openrouter`                                     |
 | `nvidia-api-key`          | No       | —                     | Used when `provider` or `aux-provider` is `nvidia`                                         |
 | `zai-api-key`             | No       | —                     | Used when `provider` or `aux-provider` is `zai-coding-plan`                                |
@@ -107,8 +109,8 @@ action inputs or environment variables:
 `JBOT_AUX_PROVIDER` when set, otherwise the main provider. Their model comes
 from `aux-model` or `JBOT_REVIEW_AUX_MODEL` when set, otherwise the main model.
 Provider API keys can also be supplied through their standard env vars, such as
-`OPENROUTER_API_KEY`, `NVIDIA_API_KEY`, or `ZAI_API_KEY`. `opencode-go` uses
-the same `OPENCODE_API_KEY` as `opencode`.
+`GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `NVIDIA_API_KEY`, or `ZAI_API_KEY`.
+`opencode-go` uses the same `OPENCODE_API_KEY` as `opencode`.
 This convenience pattern exposes every configured provider key to the action
 runtime. For a least-privilege setup, pass only the selected provider's key and,
 when needed, the aux provider's key:
