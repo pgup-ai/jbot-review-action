@@ -1,6 +1,6 @@
 # jbot-review-action
 
-Agentic PR reviewer powered by OpenCode. Drops into any repo with one workflow file.
+Agentic PR reviewer. Drops into any repo with one workflow file.
 
 ## Usage
 
@@ -45,6 +45,7 @@ jobs:
           nvidia-api-key: ${{ secrets.NVIDIA_API_KEY }}
           zai-api-key: ${{ secrets.ZAI_API_KEY }}
           xai-api-key: ${{ secrets.XAI_API_KEY }}
+          devin-windsurf-api-key: ${{ secrets.DEVIN_WINDSURF_API_KEY }}
           enable-context7: auto
           context7-api-key: ${{ secrets.CONTEXT7_API_KEY }}
           # Recall/precision controls (defaults shown): one general pass,
@@ -63,7 +64,7 @@ jobs:
 
 | Input                     | Required | Default               | Description                                                                                |
 | ------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
-| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, google, openrouter, nvidia, zai-coding-plan, xai) |
+| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, google, openrouter, nvidia, zai-coding-plan, xai, devin) |
 | `model`                   | No       | Provider default      | Provider model id, optionally prefixed as `provider/model`                                 |
 | `opencode-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `opencode`/`opencode-go`                         |
 | `deepseek-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `deepseek`                                       |
@@ -74,6 +75,7 @@ jobs:
 | `nvidia-api-key`          | No       | —                     | Used when `provider` or `aux-provider` is `nvidia`                                         |
 | `zai-api-key`             | No       | —                     | Used when `provider` or `aux-provider` is `zai-coding-plan`                                |
 | `xai-api-key`             | No       | —                     | Used when `provider` or `aux-provider` is `xai`                                            |
+| `devin-windsurf-api-key`  | No       | —                     | Used when `provider` or active `aux-provider` is `devin`                                   |
 | `enable-context7`         | No       | `auto`                | Use Context7 MCP for external contract changes; `auto`, `true`, or `false`                 |
 | `context7-api-key`        | No       | —                     | Optional Context7 key for reliable CI docs lookup                                          |
 | `github-token`            | Yes      | `${{ github.token }}` | Token for posting the review                                                               |
@@ -96,7 +98,8 @@ jobs:
 | `max-concurrent-sessions` | No       | `0`                   | Max model sessions in flight; `0` means unlimited                                          |
 | `fail-on-error`           | No       | `true`                | Fail the workflow when review cannot complete                                              |
 
-See [models.dev](https://models.dev/) for the full list of available models.
+See [models.dev](https://models.dev/) for the opencode-backed provider model
+catalog. Devin models are managed by the Devin CLI account.
 Use repository or organization Actions variables `JBOT_REVIEW_PROVIDER`,
 `JBOT_REVIEW_MODEL`, `JBOT_AUX_PROVIDER`, and `JBOT_REVIEW_AUX_MODEL` to change
 future review runs without editing workflow YAML.
@@ -109,8 +112,11 @@ action inputs or environment variables:
 `JBOT_AUX_PROVIDER` when set, otherwise the main provider. Their model comes
 from `aux-model` or `JBOT_REVIEW_AUX_MODEL` when set, otherwise the main model.
 Provider API keys can also be supplied through their standard env vars, such as
-`GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `NVIDIA_API_KEY`, or `ZAI_API_KEY`.
-`opencode-go` uses the same `OPENCODE_API_KEY` as `opencode`.
+`GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `NVIDIA_API_KEY`, `ZAI_API_KEY`, or
+`DEVIN_WINDSURF_API_KEY`. `opencode-go` uses the same `OPENCODE_API_KEY` as
+`opencode`.
+Use `provider: devin` with `devin-windsurf-api-key` /
+`DEVIN_WINDSURF_API_KEY` for the Devin CLI backend.
 This convenience pattern exposes every configured provider key to the action
 runtime. For a least-privilege setup, pass only the selected provider's key and,
 when needed, the aux provider's key:
@@ -140,6 +146,9 @@ resolve PR review threads, then pass it through `thread-resolution-token`.
 If the selected aux provider's normal key input or env var is supplied, jbot
 uses it for auxiliary sessions. If it is not supplied, jbot reuses the review
 provider's key.
+Devin cannot reuse opencode-provider keys, and opencode-backed providers cannot
+reuse `DEVIN_WINDSURF_API_KEY`, so mixed Devin/opencode-backed main+aux
+configurations must pass both keys.
 
 If `model` is prefixed as `provider/model`, that prefix must match the selected
 `provider`. If `aux-model` is prefixed as `provider/model`, that prefix must
