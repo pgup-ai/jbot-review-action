@@ -57,6 +57,7 @@ jobs:
           zai-api-key: ${{ secrets.ZAI_API_KEY }}
           xai-api-key: ${{ secrets.XAI_API_KEY }}
           devin-windsurf-api-key: ${{ secrets.DEVIN_WINDSURF_API_KEY }}
+          commandcode-access-key: ${{ secrets.COMMANDCODE_ACCESS_KEY }}
           enable-context7: auto
           context7-api-key: ${{ secrets.CONTEXT7_API_KEY }}
           # Recall/precision controls (defaults shown): one general pass,
