@@ -54,6 +54,10 @@ inputs:
     description: 'Devin/Windsurf API key. Used when provider or active aux-provider is devin.'
     required: false
     default: ''
+  commandcode-access-key:
+    description: 'CommandCode CLI access key. Used when provider or active aux-provider is commandcode.'
+    required: false
+    default: ''
   enable-context7:
     description: 'Enable Context7 MCP documentation lookup for external API/SDK/framework/workflow changes. Use auto, true, or false.'
     required: false
@@ -157,6 +161,7 @@ runs:
     INPUT_ZAI-API-KEY: ${{ inputs.zai-api-key }}
     INPUT_XAI-API-KEY: ${{ inputs.xai-api-key }}
     INPUT_DEVIN-WINDSURF-API-KEY: ${{ inputs.devin-windsurf-api-key }}
+    INPUT_COMMANDCODE-ACCESS-KEY: ${{ inputs.commandcode-access-key }}
     INPUT_ENABLE-CONTEXT7: ${{ inputs.enable-context7 }}
     INPUT_CONTEXT7-API-KEY: ${{ inputs.context7-api-key }}
     INPUT_GITHUB-TOKEN: ${{ inputs.github-token }}
