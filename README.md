@@ -47,6 +47,7 @@ jobs:
           xai-api-key: ${{ secrets.XAI_API_KEY }}
           devin-windsurf-api-key: ${{ secrets.DEVIN_WINDSURF_API_KEY }}
           commandcode-access-key: ${{ secrets.COMMANDCODE_ACCESS_KEY }}
+          cursor-api-key: ${{ secrets.CURSOR_API_KEY }}
           enable-context7: auto
           context7-api-key: ${{ secrets.CONTEXT7_API_KEY }}
           # Recall/precision controls (defaults shown): one general pass,
@@ -65,7 +66,7 @@ jobs:
 
 | Input                     | Required | Default               | Description                                                                                |
 | ------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
-| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, google, openrouter, nvidia, zai-coding-plan, xai, devin, commandcode) |
+| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, google, openrouter, nvidia, zai-coding-plan, xai, devin, commandcode, cursor) |
 | `model`                   | No       | Provider default      | Provider model id, optionally prefixed as `provider/model`                                 |
 | `opencode-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `opencode`/`opencode-go`                         |
 | `deepseek-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `deepseek`                                       |
@@ -78,6 +79,7 @@ jobs:
 | `xai-api-key`             | No       | —                     | Used when `provider` or `aux-provider` is `xai`                                            |
 | `devin-windsurf-api-key`  | No       | —                     | Used when `provider` or active `aux-provider` is `devin`                                   |
 | `commandcode-access-key`  | No       | —                     | Used when `provider` or active `aux-provider` is `commandcode`                             |
+| `cursor-api-key`          | No       | —                     | Used when `provider` or active `aux-provider` is `cursor`                                  |
 | `enable-context7`         | No       | `auto`                | Use Context7 MCP for external contract changes; `auto`, `true`, or `false`                 |
 | `context7-api-key`        | No       | —                     | Optional Context7 key for reliable CI docs lookup                                          |
 | `github-token`            | Yes      | `${{ github.token }}` | Token for posting the review                                                               |
@@ -101,7 +103,7 @@ jobs:
 | `fail-on-error`           | No       | `true`                | Fail the workflow when review cannot complete                                              |
 
 See [models.dev](https://models.dev/) for the opencode-backed provider model
-catalog. Devin and CommandCode models are managed by their CLI accounts.
+catalog. Devin, CommandCode, and Cursor models are managed by their CLI accounts.
 Use repository or organization Actions variables `JBOT_REVIEW_PROVIDER`,
 `JBOT_REVIEW_MODEL`, `JBOT_AUX_PROVIDER`, and `JBOT_REVIEW_AUX_MODEL` to change
 future review runs without editing workflow YAML.
@@ -121,6 +123,9 @@ Use `provider: devin` with `devin-windsurf-api-key` /
 `DEVIN_WINDSURF_API_KEY` for the Devin CLI backend.
 Use `provider: commandcode` with `commandcode-access-key` /
 `COMMANDCODE_ACCESS_KEY` for the CommandCode CLI backend.
+Use `provider: cursor` with `cursor-api-key` / `CURSOR_API_KEY` for the Cursor
+CLI backend. It authenticates straight from `CURSOR_API_KEY` and runs read-only
+(`cursor-agent --mode plan`).
 This convenience pattern exposes every configured provider key to the action
 runtime. For a least-privilege setup, pass only the selected provider's key and,
 when needed, the aux provider's key:
@@ -151,9 +156,9 @@ If the selected aux provider's normal key input or env var is supplied, jbot
 uses it for auxiliary sessions. If it is not supplied, jbot reuses the review
 provider's key.
 CLI backends cannot reuse opencode-provider keys, and opencode-backed providers
-cannot reuse CLI credentials such as `DEVIN_WINDSURF_API_KEY` or
-`COMMANDCODE_ACCESS_KEY`, so mixed CLI/opencode-backed main+aux configurations
-must pass both keys.
+cannot reuse CLI credentials such as `DEVIN_WINDSURF_API_KEY`,
+`COMMANDCODE_ACCESS_KEY`, or `CURSOR_API_KEY`, so mixed CLI/opencode-backed
+main+aux configurations must pass both keys.
 
 If `model` is prefixed as `provider/model`, that prefix must match the selected
 `provider`. If `aux-model` is prefixed as `provider/model`, that prefix must
