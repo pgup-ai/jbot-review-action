@@ -2,6 +2,32 @@
 
 Agentic PR reviewer. Drops into any repo with one workflow file.
 
+## Supported integrations
+
+Top-level providers use `provider: ...`. Model-family rows use an OpenCode
+gateway plus the shown `model` namespace.
+
+| Integration | Configure with | Status |
+| --- | --- | --- |
+| <img src="docs/assets/logos/anthropic.svg" width="15" style="vertical-align: -0.125em;" alt=""> Claude | `provider: anthropic` | Fully supported |
+| <img src="docs/assets/logos/commandcode.svg" width="15" style="vertical-align: -0.125em;" alt=""> Command Code | `provider: commandcode` | Fully supported |
+| <img src="docs/assets/logos/cursor.svg" width="15" style="vertical-align: -0.125em;" alt=""> Cursor | `provider: cursor` | Fully supported |
+| <img src="docs/assets/logos/deepseek.svg" width="15" style="vertical-align: -0.125em;" alt=""> DeepSeek | `provider: deepseek` | Fully supported |
+| <img src="docs/assets/logos/devin.svg" width="15" style="vertical-align: -0.125em;" alt=""> Devin | `provider: devin` | Fully supported |
+| <img src="docs/assets/logos/google.svg" width="15" style="vertical-align: -0.125em;" alt=""> Gemini | `provider: google` | Fully supported |
+| <img src="docs/assets/logos/zai-coding-plan.svg" width="15" style="vertical-align: -0.125em;" alt=""> GLM | `provider: zai-coding-plan` or `provider: opencode-go`, `model: glm-*` | Fully supported |
+| <img src="docs/assets/logos/kimi.svg" width="15" style="vertical-align: -0.125em;" alt=""> Kimi | `provider: opencode-go`, `model: moonshotai/kimi-*` | Fully supported |
+| <img src="docs/assets/logos/minimax.svg" width="15" style="vertical-align: -0.125em;" alt=""> MiniMax | `provider: opencode` or `provider: opencode-go`, `model: minimax-*` | Fully supported |
+| <img src="docs/assets/logos/mimo.svg" width="15" style="vertical-align: -0.125em;" alt=""> MiMo | `provider: opencode-go`, `model: xiaomi/mimo-*` | Fully supported |
+| <img src="docs/assets/logos/nvidia.svg" width="15" style="vertical-align: -0.125em;" alt=""> NVIDIA | `provider: nvidia` | Fully supported |
+| <img src="docs/assets/logos/openai.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenAI | `provider: openai` | Fully supported |
+| <img src="docs/assets/logos/opencode.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenCode | `provider: opencode` | Fully supported |
+| <img src="docs/assets/logos/opencode-go.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenCode Go | `provider: opencode-go` | Fully supported |
+| <img src="docs/assets/logos/openrouter.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenRouter | `provider: openrouter` | Fully supported |
+| <img src="docs/assets/logos/qwen.svg" width="15" style="vertical-align: -0.125em;" alt=""> Qwen | `provider: opencode-go`, `model: qwen*` | Fully supported |
+| <img src="docs/assets/logos/vercel.svg" width="15" style="vertical-align: -0.125em;" alt=""> Vercel | `provider: opencode`, `model: vercel/...` | Fully supported |
+| <img src="docs/assets/logos/xai.svg" width="15" style="vertical-align: -0.125em;" alt=""> xAI | `provider: xai` | Fully supported |
+
 ## Usage
 
 Copy [`examples/jbot-review.yml`](examples/jbot-review.yml) into
