@@ -50,6 +50,10 @@ inputs:
     description: 'xAI API key. Used when provider or aux-provider is xai.'
     required: false
     default: ''
+  fireworks-api-key:
+    description: 'Fireworks AI API key. Used when provider or aux-provider is fireworks-ai.'
+    required: false
+    default: ''
   devin-windsurf-api-key:
     description: 'Devin/Windsurf API key. Used when provider or active aux-provider is devin.'
     required: false
@@ -164,6 +168,7 @@ runs:
     INPUT_NVIDIA-API-KEY: ${{ inputs.nvidia-api-key }}
     INPUT_ZAI-API-KEY: ${{ inputs.zai-api-key }}
     INPUT_XAI-API-KEY: ${{ inputs.xai-api-key }}
+    INPUT_FIREWORKS-API-KEY: ${{ inputs.fireworks-api-key }}
     INPUT_DEVIN-WINDSURF-API-KEY: ${{ inputs.devin-windsurf-api-key }}
     INPUT_COMMANDCODE-ACCESS-KEY: ${{ inputs.commandcode-access-key }}
     INPUT_CURSOR-API-KEY: ${{ inputs.cursor-api-key }}
