@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/logo.png" width="72" alt="J-Bot Review" />
+</p>
+
 # jbot-review-action
 
 Agentic PR reviewer. Drops into any repo with one workflow file.
