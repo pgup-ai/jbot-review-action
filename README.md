@@ -169,7 +169,9 @@ Use `provider: codex` with `codex-auth` / `CODEX_AUTH_JSON` (the contents of
 backend. It runs read-only (`codex exec --sandbox read-only`).
 Use `provider: cline` with `cline-auth` / `CLINE_AUTH_JSON` (the contents of
 `~/.cline/data/settings/providers.json` from a local `cline auth`) for the Cline
-CLI backend. It runs read-only (`cline --plan --auto-approve false`).
+CLI backend. It runs read-only (`cline --plan --auto-approve false`), uses only the
+auth token, and follows your file's billing mode — both pay-as-you-go (`cline`) and
+the Cline subscription (`cline-pass`) work.
 This convenience pattern exposes every configured provider key to the action
 runtime. For a least-privilege setup, pass only the selected provider's key and,
 when needed, the aux provider's key:
