@@ -171,7 +171,9 @@ Use `provider: cline` (pay-as-you-go) or `provider: cline-pass` (Cline subscript
 with `cline-auth` / `CLINE_AUTH_JSON` (the contents of
 `~/.cline/data/settings/providers.json` from a local `cline auth`) for the Cline CLI
 backend. The two billing modes are separate providers sharing the one secret; both run
-read-only (`cline --plan --auto-approve false`) and use only the auth token.
+read-only (`cline --plan --auto-approve false`) and use only the auth token. Set `model`
+as `cline/<type>/<model>` (e.g. `cline/deepseek/deepseek-v4-flash`) or
+`cline-pass/<model>` (e.g. `cline-pass/glm-5.2`); omit it to use each mode's default.
 This convenience pattern exposes every configured provider key to the action
 runtime. For a least-privilege setup, pass only the selected provider's key and,
 when needed, the aux provider's key:
