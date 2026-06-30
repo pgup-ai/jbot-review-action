@@ -14,7 +14,7 @@ gateway plus the shown `model` namespace.
 | Integration | Configure with | Status |
 | --- | --- | --- |
 | <img src="docs/assets/logos/anthropic.svg" width="15" style="vertical-align: -0.125em;" alt=""> Claude | `provider: anthropic` | Fully supported |
-| <img src="docs/assets/logos/cline.svg" width="15" style="vertical-align: -0.125em;" alt=""> Cline | `provider: cline` | Fully supported |
+| <img src="docs/assets/logos/cline.svg" width="15" style="vertical-align: -0.125em;" alt=""> Cline | `provider: cline` (pay-as-you-go) or `cline-pass` (subscription) | Fully supported |
 | <img src="docs/assets/logos/codex.svg" width="15" style="vertical-align: -0.125em;" alt=""> Codex | `provider: codex` | Fully supported |
 | <img src="docs/assets/logos/commandcode.svg" width="15" style="vertical-align: -0.125em;" alt=""> Command Code | `provider: commandcode` | Fully supported |
 | <img src="docs/assets/logos/cursor.svg" width="15" style="vertical-align: -0.125em;" alt=""> Cursor | `provider: cursor` | Fully supported |
@@ -100,7 +100,7 @@ jobs:
 
 | Input                     | Required | Default               | Description                                                                                |
 | ------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
-| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, google, openrouter, nvidia, zai-coding-plan, xai, fireworks-ai, devin, commandcode, cursor, codex, cline) |
+| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, google, openrouter, nvidia, zai-coding-plan, xai, fireworks-ai, devin, commandcode, cursor, codex, cline, cline-pass) |
 | `model`                   | No       | Provider default      | Provider model id, optionally prefixed as `provider/model`                                 |
 | `opencode-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `opencode`/`opencode-go`                         |
 | `deepseek-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `deepseek`                                       |
@@ -167,11 +167,11 @@ CLI backend. It authenticates straight from `CURSOR_API_KEY` and runs read-only
 Use `provider: codex` with `codex-auth` / `CODEX_AUTH_JSON` (the contents of
 `~/.codex/auth.json` from a ChatGPT Plus/Pro `codex login`) for the Codex CLI
 backend. It runs read-only (`codex exec --sandbox read-only`).
-Use `provider: cline` with `cline-auth` / `CLINE_AUTH_JSON` (the contents of
-`~/.cline/data/settings/providers.json` from a local `cline auth`) for the Cline
-CLI backend. It runs read-only (`cline --plan --auto-approve false`), uses only the
-auth token, and follows your file's billing mode — both pay-as-you-go (`cline`) and
-the Cline subscription (`cline-pass`) work.
+Use `provider: cline` (pay-as-you-go) or `provider: cline-pass` (Cline subscription)
+with `cline-auth` / `CLINE_AUTH_JSON` (the contents of
+`~/.cline/data/settings/providers.json` from a local `cline auth`) for the Cline CLI
+backend. The two billing modes are separate providers sharing the one secret; both run
+read-only (`cline --plan --auto-approve false`) and use only the auth token.
 This convenience pattern exposes every configured provider key to the action
 runtime. For a least-privilege setup, pass only the selected provider's key and,
 when needed, the aux provider's key:
