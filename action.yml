@@ -71,7 +71,7 @@ inputs:
     required: false
     default: ''
   cline-auth:
-    description: 'Cline CLI auth: the contents of ~/.cline/data/settings/providers.json. Used when provider or active aux-provider is cline.'
+    description: 'Cline CLI auth: the contents of ~/.cline/data/settings/providers.json. Used when provider or active aux-provider is cline or cline-pass.'
     required: false
     default: ''
   enable-context7:
