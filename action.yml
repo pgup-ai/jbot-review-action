@@ -74,6 +74,10 @@ inputs:
     description: 'Cline CLI auth: the contents of ~/.cline/data/settings/providers.json. Used when provider or active aux-provider is cline or cline-pass.'
     required: false
     default: ''
+  kilo-auth:
+    description: 'Kilo CLI auth: the contents of ~/.local/share/kilo/auth.json. Used when provider or active aux-provider is kilo.'
+    required: false
+    default: ''
   enable-context7:
     description: 'Enable Context7 MCP documentation lookup for external API/SDK/framework/workflow changes. Use auto, true, or false.'
     required: false
@@ -186,6 +190,7 @@ runs:
     INPUT_CURSOR-API-KEY: ${{ inputs.cursor-api-key }}
     INPUT_CODEX-AUTH: ${{ inputs.codex-auth }}
     INPUT_CLINE-AUTH: ${{ inputs.cline-auth }}
+    INPUT_KILO-AUTH: ${{ inputs.kilo-auth }}
     INPUT_ENABLE-CONTEXT7: ${{ inputs.enable-context7 }}
     INPUT_CONTEXT7-API-KEY: ${{ inputs.context7-api-key }}
     INPUT_GITHUB-TOKEN: ${{ inputs.github-token }}
