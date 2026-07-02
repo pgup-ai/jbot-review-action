@@ -62,6 +62,7 @@ jobs:
           cursor-api-key: ${{ secrets.CURSOR_API_KEY }}
           codex-auth: ${{ secrets.CODEX_AUTH_JSON }}
           cline-auth: ${{ secrets.CLINE_AUTH_JSON }}
+          kilo-auth: ${{ secrets.KILO_AUTH_CONTENT }}
           enable-context7: auto
           context7-api-key: ${{ secrets.CONTEXT7_API_KEY }}
           # Recall/precision controls (defaults shown): one general pass,
