@@ -3,6 +3,8 @@ name: J-Bot Code Review
 on:
   pull_request:
     types: [opened, reopened, ready_for_review, synchronize]
+  issue_comment: # one-off reviews: "/jbot [--provider=<id>] [--model=<id>]" on a PR
+    types: [created]
   workflow_dispatch:
     inputs:
       pr-number:
@@ -21,31 +23,120 @@ on:
         required: false
         default: 'false'
 
-concurrency:
-  group: jbot-review-${{ github.event.pull_request.number || inputs['pr-number'] || github.run_id }}
-  cancel-in-progress: true
-
 permissions:
   contents: read
   pull-requests: write
-  issues: write # PR reactions (jbot's review-done 🚀) use the issues API
+  issues: write # PR reactions (jbot's review-done 🚀, /jbot's 👀 ack) use the issues API
   checks: read
 
 jobs:
+  # /jbot one-off reviews. Separate job so a rejected command never queues into
+  # the review concurrency group — queueing there would evict a live review.
+  command:
+    # Gate: PR comments only, /jbot-prefixed, commenter with repo rights —
+    # every accepted command spends provider credits.
+    if: >-
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/jbot') &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    outputs:
+      proceed: ${{ steps.cmd.outputs.proceed }}
+      provider: ${{ steps.cmd.outputs.provider }}
+      model: ${{ steps.cmd.outputs.model }}
+    steps:
+      - name: Parse /jbot command
+        id: cmd
+        env:
+          # Untrusted input — never interpolate into the script via ${{ }}.
+          COMMENT_BODY: ${{ github.event.comment.body }}
+        run: |
+          set -f # no globbing: prose tokens like * must stay literal
+          first_line="$(printf '%s\n' "$COMMENT_BODY" | head -n1 | tr -d '\r')"
+          provider='' model='' seen_cmd=false bad=false
+          for tok in $first_line; do
+            if [ "$seen_cmd" = false ]; then
+              [ "$tok" = '/jbot' ] || bad=true
+              seen_cmd=true
+              continue
+            fi
+            case "$tok" in
+              --provider=* | --model=*)
+                key="${tok%%=*}" val="${tok#*=}"
+                case "$val" in
+                  '') echo "::warning::/jbot: $key has an empty value; using the repo default" ;;
+                  *[!A-Za-z0-9._:/-]*) echo "::warning::/jbot: ignoring $key value with unsupported characters; using the repo default" ;;
+                  *) if [ "$key" = '--provider' ]; then provider="$val"; else model="$val"; fi ;;
+                esac
+                ;;
+              --*) echo "::warning::/jbot: ignoring unknown flag ${tok%%=*}" ;;
+              # Prose mentions ("/jbot is failing...") must not burn a review run.
+              *) bad=true ;;
+            esac
+          done
+          if [ "$bad" = true ] || [ "$seen_cmd" = false ]; then
+            echo "::error::Not a /jbot command; expected '/jbot [--provider=<id>] [--model=<id>]' as the first line."
+            exit 1
+          fi
+          if printf '%s\n' "$COMMENT_BODY" | tail -n +2 | grep -qE -- '--(provider|model)='; then
+            echo "::warning::/jbot: flags after the first line are ignored"
+          fi
+          {
+            echo "provider=$provider"
+            echo "model=$model"
+            echo "proceed=true"
+          } >> "$GITHUB_OUTPUT"
+          echo "/jbot overrides: provider='${provider:-<unset>}' model='${model:-<unset>}'"
+      # Fork-head PRs are refused by default: a /jbot run reviews the fork's
+      # code with YOUR provider keys and a write-scoped token in the container
+      # env. Delete this step to allow it — see "One-off reviews" in the README.
+      - name: Require same-repo PR head
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cross="$(gh pr view '${{ github.event.issue.number }}' --repo '${{ github.repository }}' --json isCrossRepository --jq .isCrossRepository)"
+          if [ "$cross" != "false" ]; then
+            echo "::error::/jbot is disabled for fork-head PRs by default: the review would run repo secrets against the fork's code. Delete the 'Require same-repo PR head' step to allow it."
+            exit 1
+          fi
+      - name: Ack /jbot command # last: 👀 means the command was accepted
+        continue-on-error: true # ack is UX; never blocks the review
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api "repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions" -f content=eyes --silent
+
   review:
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
+    needs: [command]
+    # always(): command is skipped on pull_request/dispatch events and must not
+    # auto-skip this job; the conditions below re-gate every event.
+    if: >-
+      always() && (
+        github.event_name == 'workflow_dispatch' ||
+        (github.event_name == 'pull_request' && github.event.pull_request.draft == false) ||
+        (github.event_name == 'issue_comment' && needs.command.outputs.proceed == 'true')
+      )
+    # One review per PR (auto + one-off share the group; markers and threads
+    # race otherwise). Job-level, and only on this job: rejected commands and
+    # gate-skipped comment runs must never evict a live review.
+    concurrency:
+      group: jbot-review-${{ github.event.pull_request.number || inputs['pr-number'] || github.event.issue.number || github.run_id }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha || format('refs/pull/{0}/head', inputs['pr-number']) }}
+          # issue_comment and workflow_dispatch run on the default branch, so
+          # explicitly check out the PR head they target.
+          ref: ${{ github.event.pull_request.head.sha || format('refs/pull/{0}/head', inputs['pr-number'] || github.event.issue.number) }}
 
       - uses: pgup-ai/jbot-review-action@v0
         with:
-          provider: ${{ inputs.provider || vars.JBOT_REVIEW_PROVIDER || 'opencode' }}
-          model: ${{ inputs.model || vars.JBOT_REVIEW_MODEL || '' }}
-          pr-number: ${{ github.event.pull_request.number || inputs['pr-number'] }}
+          # Precedence: /jbot comment flag > dispatch input > repo variable > default.
+          provider: ${{ needs.command.outputs.provider || inputs.provider || vars.JBOT_REVIEW_PROVIDER || 'opencode' }}
+          model: ${{ needs.command.outputs.model || inputs.model || vars.JBOT_REVIEW_MODEL || '' }}
+          pr-number: ${{ github.event.pull_request.number || inputs['pr-number'] || github.event.issue.number }}
           dry-run: ${{ inputs['dry-run'] || 'false' }}
           opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
           deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
