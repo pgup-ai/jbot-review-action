@@ -40,6 +40,11 @@ jobs:
       github.event.issue.pull_request &&
       startsWith(github.event.comment.body, '/jbot') &&
       contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+    # This job handles untrusted comment text — drop every other scope. The 👀
+    # ack needs pull-requests (not issues) write: reactions on PR comments are
+    # gated by the pull-requests permission (verified; issues-only 403s).
+    permissions:
+      pull-requests: write # 👀 ack reaction + gh pr view (fork-head guard)
     runs-on: ubuntu-latest
     outputs:
       # proceed comes from its own step AFTER the guard: outputs of earlier
@@ -72,7 +77,10 @@ jobs:
                   *) if [ "$key" = '--provider' ]; then provider="$val"; else model="$val"; fi ;;
                 esac
                 ;;
-              --*) echo "::warning::/jbot: ignoring unknown flag ${tok%%=*}" ;;
+              --*)
+                echo "::error::/jbot: unknown flag ${tok%%=*}; supported: --provider=<id> --model=<id>"
+                bad=true
+                ;;
               # Prose mentions ("/jbot is failing...") must not burn a review run.
               *) bad=true ;;
             esac
@@ -121,8 +129,9 @@ jobs:
         (github.event_name == 'issue_comment' && needs.command.outputs.proceed == 'true')
       )
     # One review per PR (auto + one-off share the group; markers and threads
-    # race otherwise). Job-level, and only on this job: rejected commands and
-    # gate-skipped comment runs must never evict a live review.
+    # race otherwise — a PR's issue.number is its PR number). Job-level, and
+    # only on this job: rejected commands and gate-skipped comment runs must
+    # never evict a live review.
     concurrency:
       group: jbot-review-${{ github.event.pull_request.number || inputs['pr-number'] || github.event.issue.number || github.run_id }}
       cancel-in-progress: true

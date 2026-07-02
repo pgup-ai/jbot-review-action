@@ -111,9 +111,9 @@ final sign-off with a stronger model than the auto-review default:
   (`JBOT_REVIEW_PROVIDER` / `JBOT_REVIEW_MODEL`); a flag you omit falls back to
   it. Bare `/jbot` re-runs the review with your configured defaults. The
   command is the first line of the comment: `/jbot` followed only by
-  `--flag=value` flags. Anything else on that line rejects the command (so
-  prose like "/jbot is failing" never starts a review), and lines after the
-  first are ignored.
+  `--provider=<id>` / `--model=<id>` flags. Anything else on that line —
+  prose like "/jbot is failing", or an unknown flag — rejects the command
+  without spending a review, and lines after the first are ignored.
 - `--model` alone switches the model **within the configured provider**. To
   switch providers, pass `--provider` too (as above) — a `provider/` model
   prefix is only stripped when it matches the selected provider, so a foreign
