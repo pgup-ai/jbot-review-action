@@ -97,6 +97,49 @@ jobs:
           thread-resolution-token: ${{ secrets.JBOT_REVIEW_THREAD_RESOLUTION_TOKEN }}
 ```
 
+## One-off reviews (`/jbot`)
+
+The [full example workflow](examples/jbot-review.yml) (not the minimal version
+above) also lets you trigger a one-off review by commenting on a PR — say, a
+final sign-off with a stronger model than the auto-review default:
+
+```
+/jbot --provider=devin --model=devin/glm-5.2
+```
+
+- Both flags are optional. A flag you pass overrides the repo variable
+  (`JBOT_REVIEW_PROVIDER` / `JBOT_REVIEW_MODEL`); a flag you omit falls back to
+  it. Bare `/jbot` re-runs the review with your configured defaults. The
+  command is the first line of the comment: `/jbot` followed only by
+  `--provider=<id>` / `--model=<id>` flags. Anything else on that line —
+  prose like "/jbot is failing", or an unknown flag — rejects the command
+  without spending a review, and lines after the first are ignored.
+- `--model` alone switches the model **within the configured provider**. To
+  switch providers, pass `--provider` too (as above) — a `provider/` model
+  prefix is only stripped when it matches the selected provider, so a foreign
+  prefix would be sent to the configured provider verbatim and typically 404.
+  The provider you pick must have its API key wired up in the workflow.
+- Only comments from users with repo rights (owner, member, or collaborator —
+  GitHub counts read-only org members as members) trigger a run — each run
+  spends provider credits. jbot reacts 👀 when it accepts the command; the
+  review then posts like any auto-review (the 🚀 review-done reaction appears
+  only when no jbot findings remain open).
+- **Fork PRs are refused by default.** Unlike `pull_request` runs (where
+  GitHub strips secrets on fork PRs), a `/jbot` run executes in base-repo
+  context: your provider keys and a write-scoped `GITHUB_TOKEN` sit in the
+  review container's environment while it reads the fork's code. Delete the
+  `Require same-repo PR head` step in the workflow to allow it, and invoke
+  only on fork PRs you've inspected.
+- One-off and auto reviews share a concurrency group per PR: a `/jbot` run
+  cancels an in-flight auto review of that PR and vice versa. Prior findings
+  are not re-posted — a one-off with a stronger model only **adds** what the
+  auto-runs missed, which is exactly what a sign-off pass should do.
+- Prefer a UI? `workflow_dispatch` (Actions → J-Bot Code Review → *Run
+  workflow*) takes the same `provider` / `model` overrides plus a `pr-number`.
+- Once the `issue_comment` trigger is installed, every comment in the repo
+  records a skipped zero-step run in the Actions tab — expected, free, and
+  the reason non-command comments can never cancel a running review.
+
 ## Inputs
 
 | Input                     | Required | Default               | Description                                                                                |
