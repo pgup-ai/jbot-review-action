@@ -42,7 +42,9 @@ jobs:
       contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
     runs-on: ubuntu-latest
     outputs:
-      proceed: ${{ steps.cmd.outputs.proceed }}
+      # proceed comes from its own step AFTER the guard: outputs of earlier
+      # steps survive a failed job, and review's always() would honor them.
+      proceed: ${{ steps.ok.outputs.proceed }}
       provider: ${{ steps.cmd.outputs.provider }}
       model: ${{ steps.cmd.outputs.model }}
     steps:
@@ -85,7 +87,6 @@ jobs:
           {
             echo "provider=$provider"
             echo "model=$model"
-            echo "proceed=true"
           } >> "$GITHUB_OUTPUT"
           echo "/jbot overrides: provider='${provider:-<unset>}' model='${model:-<unset>}'"
       # Fork-head PRs are refused by default: a /jbot run reviews the fork's
@@ -100,6 +101,9 @@ jobs:
             echo "::error::/jbot is disabled for fork-head PRs by default: the review would run repo secrets against the fork's code. Delete the 'Require same-repo PR head' step to allow it."
             exit 1
           fi
+      - name: Confirm command
+        id: ok
+        run: echo "proceed=true" >> "$GITHUB_OUTPUT"
       - name: Ack /jbot command # last: 👀 means the command was accepted
         continue-on-error: true # ack is UX; never blocks the review
         env:
