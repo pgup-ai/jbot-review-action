@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/logo.png" width="72" alt="J-Bot Review" />
+  <img src="docs/assets/social-preview.png" alt="J-Bot Review" />
 </p>
 
 # jbot-review-action
