@@ -26,7 +26,7 @@ gateway plus the shown `model` namespace.
 | <img src="docs/assets/logos/kilo.svg" width="15" style="vertical-align: -0.125em;" alt=""> Kilo | `provider: kilo` (free gateway default) | Fully supported |
 | <img src="docs/assets/logos/kimi.svg" width="15" style="vertical-align: -0.125em;" alt=""> Kimi | `provider: opencode-go`, `model: moonshotai/kimi-*` | Fully supported |
 | <img src="docs/assets/logos/minimax.svg" width="15" style="vertical-align: -0.125em;" alt=""> MiniMax | `provider: opencode` or `provider: opencode-go`, `model: minimax-*` | Fully supported |
-| <img src="docs/assets/logos/mimo.svg" width="15" style="vertical-align: -0.125em;" alt=""> MiMo | `provider: opencode-go`, `model: xiaomi/mimo-*` | Fully supported |
+| <img src="docs/assets/logos/mimo.svg" width="15" style="vertical-align: -0.125em;" alt=""> MiMo | `provider: xiaomi-token-plan-sgp` or `provider: opencode-go`, `model: xiaomi/mimo-*` | Fully supported |
 | <img src="docs/assets/logos/nvidia.svg" width="15" style="vertical-align: -0.125em;" alt=""> NVIDIA | `provider: nvidia` | Fully supported |
 | <img src="docs/assets/logos/openai.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenAI | `provider: openai` | Fully supported |
 | <img src="docs/assets/logos/opencode.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenCode | `provider: opencode` | Fully supported |
@@ -145,7 +145,7 @@ final sign-off with a stronger model than the auto-review default:
 
 | Input                     | Required | Default               | Description                                                                                |
 | ------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
-| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, google, openrouter, nvidia, zai-coding-plan, xai, fireworks-ai, devin, commandcode, cursor, codex, cline, cline-pass, kilo) |
+| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, google, openrouter, nvidia, zai-coding-plan, xai, xiaomi-token-plan-sgp, fireworks-ai, devin, commandcode, cursor, codex, cline, cline-pass, kilo) |
 | `model`                   | No       | Provider default      | Provider model id, optionally prefixed as `provider/model`                                 |
 | `opencode-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `opencode`/`opencode-go`                         |
 | `deepseek-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `deepseek`                                       |
