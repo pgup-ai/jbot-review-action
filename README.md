@@ -80,6 +80,7 @@ jobs:
           zai-api-key: ${{ secrets.ZAI_API_KEY }}
           xai-api-key: ${{ secrets.XAI_API_KEY }}
           fireworks-api-key: ${{ secrets.FIREWORKS_API_KEY }}
+          mimo-api-key: ${{ secrets.MIMO_API_KEY }}
           devin-windsurf-api-key: ${{ secrets.DEVIN_WINDSURF_API_KEY }}
           commandcode-access-key: ${{ secrets.COMMANDCODE_ACCESS_KEY }}
           cursor-api-key: ${{ secrets.CURSOR_API_KEY }}
@@ -156,6 +157,7 @@ final sign-off with a stronger model than the auto-review default:
 | `zai-api-key`             | No       | —                     | Used when `provider` or `aux-provider` is `zai-coding-plan`                                |
 | `xai-api-key`             | No       | —                     | Used when `provider` or `aux-provider` is `xai`                                            |
 | `fireworks-api-key`       | No       | —                     | Used when `provider` or `aux-provider` is `fireworks-ai`                                   |
+| `mimo-api-key`            | No       | —                     | Used when `provider` or `aux-provider` is `xiaomi-token-plan-sgp`                          |
 | `devin-windsurf-api-key`  | No       | —                     | Used when `provider` or active `aux-provider` is `devin`                                   |
 | `commandcode-access-key`  | No       | —                     | Used when `provider` or active `aux-provider` is `commandcode`                             |
 | `cursor-api-key`          | No       | —                     | Used when `provider` or active `aux-provider` is `cursor`                                  |
