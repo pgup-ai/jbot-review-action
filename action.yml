@@ -1,5 +1,5 @@
 name: 'J-Bot Code Review'
-description: 'Agentic PR review with gated inline posting.'
+description: 'Agentic PR review via opencode serve + SDK, with gated inline posting.'
 
 branding:
   icon: 'git-pull-request'
@@ -52,6 +52,10 @@ inputs:
     default: ''
   fireworks-api-key:
     description: 'Fireworks AI API key. Used when provider or aux-provider is fireworks-ai.'
+    required: false
+    default: ''
+  mimo-api-key:
+    description: 'Xiaomi MiMo Token Plan API key (tp-… / sk-…). Used when provider or aux-provider is xiaomi-token-plan-sgp.'
     required: false
     default: ''
   devin-windsurf-api-key:
@@ -119,11 +123,11 @@ inputs:
     required: false
     default: 'true'
   aux-model:
-    description: 'Model for auxiliary sessions (addressed-thread check, guideline compliance, finding verification). Uses the main model when unset.'
+    description: 'Model for auxiliary sessions (addressed-thread check, guideline compliance, finding verification). Uses aux-provider/JBOT_AUX_PROVIDER when set, otherwise the main provider. Uses the main model when unset.'
     required: false
     default: ''
   aux-provider:
-    description: 'Provider for auxiliary sessions. Uses the main provider when unset.'
+    description: 'Optional provider for aux-model. Defaults to provider/JBOT_REVIEW_PROVIDER when unset.'
     required: false
     default: ''
   review-passes:
@@ -159,9 +163,17 @@ inputs:
     required: false
     default: 'true'
   max-concurrent-sessions:
-    description: 'Max model sessions in flight at once (0 = unlimited). Throttled provider tiers serialize concurrent requests on one key upstream; capping on our side keeps session deadlines measuring model time, not queue time. Try 2-3 on free tiers.'
+    description: 'Max model sessions in flight at once (default 3; 0 = unlimited). Throttled provider tiers serialize concurrent requests on one key upstream; capping on our side keeps session deadlines measuring model time, not queue time. Set 2 on tight free tiers, or 0 for unlimited on paid concurrent tiers.'
     required: false
-    default: '0'
+    default: '3'
+  review-telemetry:
+    description: 'Emit per-finding disposition + per-session telemetry to .jbot-review/telemetry.jsonl (default true). Near-zero overhead: in-memory tagging plus one post-review write. Set false to disable.'
+    required: false
+    default: 'true'
+  evidence-quotes:
+    description: 'Ask each finding to carry a verbatim quote of the changed line it flags (default true). Grounds finding verification and lets a would-be-orphaned finding be re-anchored. Set false to keep the pre-F12 prompt.'
+    required: false
+    default: 'true'
   fail-on-error:
     description: 'Fail the workflow when the review cannot complete.'
     required: false
@@ -185,6 +197,7 @@ runs:
     INPUT_ZAI-API-KEY: ${{ inputs.zai-api-key }}
     INPUT_XAI-API-KEY: ${{ inputs.xai-api-key }}
     INPUT_FIREWORKS-API-KEY: ${{ inputs.fireworks-api-key }}
+    INPUT_MIMO-API-KEY: ${{ inputs.mimo-api-key }}
     INPUT_DEVIN-WINDSURF-API-KEY: ${{ inputs.devin-windsurf-api-key }}
     INPUT_COMMANDCODE-ACCESS-KEY: ${{ inputs.commandcode-access-key }}
     INPUT_CURSOR-API-KEY: ${{ inputs.cursor-api-key }}
@@ -212,4 +225,6 @@ runs:
     INPUT_PROMPT-CACHE: ${{ inputs.prompt-cache }}
     INPUT_SKIP-DOC-ONLY: ${{ inputs.skip-doc-only }}
     INPUT_MAX-CONCURRENT-SESSIONS: ${{ inputs.max-concurrent-sessions }}
+    INPUT_REVIEW-TELEMETRY: ${{ inputs.review-telemetry }}
+    INPUT_EVIDENCE-QUOTES: ${{ inputs.evidence-quotes }}
     INPUT_FAIL-ON-ERROR: ${{ inputs.fail-on-error }}

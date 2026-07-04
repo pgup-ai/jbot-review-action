@@ -80,6 +80,7 @@ jobs:
           zai-api-key: ${{ secrets.ZAI_API_KEY }}
           xai-api-key: ${{ secrets.XAI_API_KEY }}
           fireworks-api-key: ${{ secrets.FIREWORKS_API_KEY }}
+          mimo-api-key: ${{ secrets.MIMO_API_KEY }}
           devin-windsurf-api-key: ${{ secrets.DEVIN_WINDSURF_API_KEY }}
           commandcode-access-key: ${{ secrets.COMMANDCODE_ACCESS_KEY }}
           cursor-api-key: ${{ secrets.CURSOR_API_KEY }}
@@ -156,6 +157,7 @@ final sign-off with a stronger model than the auto-review default:
 | `zai-api-key`             | No       | —                     | Used when `provider` or `aux-provider` is `zai-coding-plan`                                |
 | `xai-api-key`             | No       | —                     | Used when `provider` or `aux-provider` is `xai`                                            |
 | `fireworks-api-key`       | No       | —                     | Used when `provider` or `aux-provider` is `fireworks-ai`                                   |
+| `mimo-api-key`            | No       | —                     | Used when `provider` or `aux-provider` is `xiaomi-token-plan-sgp`                          |
 | `devin-windsurf-api-key`  | No       | —                     | Used when `provider` or active `aux-provider` is `devin`                                   |
 | `commandcode-access-key`  | No       | —                     | Used when `provider` or active `aux-provider` is `commandcode`                             |
 | `cursor-api-key`          | No       | —                     | Used when `provider` or active `aux-provider` is `cursor`                                  |
@@ -181,7 +183,9 @@ final sign-off with a stronger model than the auto-review default:
 | `model-options`           | No       | `{"reasoningEffort":"medium"}` | JSON provider options for the main model; pass `{}` to send none                  |
 | `prompt-cache`            | No       | `true`                | Enable opencode provider prompt caching (`setCacheKey`); cuts input-token cost on models that honor it; models marked unsupported omit the cache key |
 | `skip-doc-only`           | No       | `true`                | Skip the review (no model call) when the PR changes only documentation/diagram assets (`.md`, `.svg`, `.drawio`, `.pdf`, …); the reaction is left unchanged (a docs push does not change the verdict) |
-| `max-concurrent-sessions` | No       | `0`                   | Max model sessions in flight; `0` means unlimited                                          |
+| `max-concurrent-sessions` | No       | `3`                   | Max model sessions in flight (default `3`); `0` = unlimited                                |
+| `review-telemetry`        | No       | `true`                | Emit per-finding + per-session telemetry to `.jbot-review/telemetry.jsonl`                 |
+| `evidence-quotes`         | No       | `true`                | Ask each finding to carry a verbatim quote of the changed line it flags                    |
 | `fail-on-error`           | No       | `true`                | Fail the workflow when review cannot complete                                              |
 
 See [models.dev](https://models.dev/) for the opencode-backed provider model

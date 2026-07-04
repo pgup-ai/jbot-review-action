@@ -161,6 +161,7 @@ jobs:
           zai-api-key: ${{ secrets.ZAI_API_KEY }}
           xai-api-key: ${{ secrets.XAI_API_KEY }}
           fireworks-api-key: ${{ secrets.FIREWORKS_API_KEY }}
+          mimo-api-key: ${{ secrets.MIMO_API_KEY }}
           devin-windsurf-api-key: ${{ secrets.DEVIN_WINDSURF_API_KEY }}
           commandcode-access-key: ${{ secrets.COMMANDCODE_ACCESS_KEY }}
           cursor-api-key: ${{ secrets.CURSOR_API_KEY }}
