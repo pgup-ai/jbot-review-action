@@ -217,9 +217,12 @@ Provider API keys can also be supplied through their standard env vars, such as
 `OPENCODE_API_KEY` as
 `opencode`.
 Use `provider: devin` with `devin-windsurf-api-key` /
-`DEVIN_WINDSURF_API_KEY` for the Devin CLI backend.
+`DEVIN_WINDSURF_API_KEY` for the Devin CLI backend — the secret is the
+`windsurf_api_key` value (`devin-session-token$…`) from
+`~/.local/share/devin/credentials.toml` after `devin auth login`.
 Use `provider: commandcode` with `commandcode-access-key` /
-`COMMANDCODE_ACCESS_KEY` for the CommandCode CLI backend.
+`COMMANDCODE_ACCESS_KEY` for the CommandCode CLI backend (a `user_…` access
+key, also found in `~/.commandcode/auth.json`).
 Use `provider: cursor` with `cursor-api-key` / `CURSOR_API_KEY` for the Cursor
 CLI backend. It authenticates straight from `CURSOR_API_KEY` and runs read-only
 (`cursor-agent --mode plan`).
