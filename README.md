@@ -4,6 +4,9 @@
 
 # jbot-review-action
 
+[![GitHub Marketplace](https://img.shields.io/github/v/release/pgup-ai/jbot-review-action?label=Marketplace&color=5ee39a&logo=github)](https://github.com/marketplace/actions/j-bot-code-review)
+[![License: MIT](https://img.shields.io/badge/License-MIT-5ee39a.svg)](LICENSE)
+
 **Open-source agentic PR reviewer — drops into any repo with one workflow
 file.** It runs inside your own GitHub Actions, on your runner, with a model
 you already pay for: an [OpenCode](https://opencode.ai/) gateway key (Claude,
@@ -281,6 +284,40 @@ Bare model ids are resolved against their selected provider.
 Migrating from `api-key`: replace the old unified `api-key` input with the
 matching provider-specific input, such as `opencode-api-key` for
 `provider: opencode`. The unified input is not read by current `v0` builds.
+
+## FAQ
+
+**Can I use my ChatGPT Plus/Pro, Cursor, or other CLI subscription for code review?**
+Yes — that's the point. Codex (via a ChatGPT Plus/Pro `codex login`), Cursor,
+Devin, Cline, Kilo, and Command Code seats all work as review backends. Claude
+runs through your own Anthropic API key or an OpenCode gateway instead — a
+Claude Pro/Max seat is not a supported CI credential today. Per-CLI setup:
+[pgupai.com/guides](https://www.pgupai.com/guides).
+
+**Does my code get uploaded to a third-party service?**
+No. The action runs on your GitHub Actions runner and reviews your checkout
+read-only. The diff goes only to the model provider you configure, on your own
+key or seat — there is no hosted reviewer in the loop.
+
+**What does it cost?**
+The action is MIT-licensed and adds no per-seat or per-review charge. You pay
+only the model you bring — $0 with OpenCode Zen free models or a CLI seat you
+already pay for — plus normal CI minutes.
+
+**Can the action modify my code?**
+No. The checkout is read-only, and the workflow's least-privilege defaults are
+`contents: read` and `pull-requests: write`. On `pull_request` events GitHub
+strips secrets from fork PRs.
+
+**How is this different from hosted reviewers like CodeRabbit or Greptile?**
+Hosted reviewers run your code through their own servers and charge per seat;
+this is an open action in your CI with any model, at $0/seat. It also reads
+existing `.coderabbit.yaml` and `greptile.json` rule files, so switching keeps
+your house rules. Side-by-side comparisons:
+[CodeRabbit](https://www.pgupai.com/compare/coderabbit-alternative) ·
+[Greptile](https://www.pgupai.com/compare/greptile-alternative) ·
+[Qodo](https://www.pgupai.com/compare/qodo-alternative) ·
+[Cubic](https://www.pgupai.com/compare/cubic-alternative)
 
 ## Versioning
 
