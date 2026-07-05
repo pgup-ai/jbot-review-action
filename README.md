@@ -221,8 +221,8 @@ Use `provider: devin` with `devin-windsurf-api-key` /
 `windsurf_api_key` value (`devin-session-token$…`) from
 `~/.local/share/devin/credentials.toml` after `devin auth login`.
 Use `provider: commandcode` with `commandcode-access-key` /
-`COMMANDCODE_ACCESS_KEY` for the CommandCode CLI backend (a `user_…` access
-key, also found in `~/.commandcode/auth.json`).
+`COMMANDCODE_ACCESS_KEY` for the CommandCode CLI backend — the `apiKey`
+value (`user_…`) from `~/.commandcode/auth.json`.
 Use `provider: cursor` with `cursor-api-key` / `CURSOR_API_KEY` for the Cursor
 CLI backend. It authenticates straight from `CURSOR_API_KEY` and runs read-only
 (`cursor-agent --mode plan`).
