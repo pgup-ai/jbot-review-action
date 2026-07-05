@@ -295,9 +295,10 @@ Claude Pro/Max seat is not a supported CI credential today. Per-CLI setup:
 [pgupai.com/guides](https://www.pgupai.com/guides).
 
 **Does my code get uploaded to a third-party service?**
-No. The action runs on your GitHub Actions runner and reviews your checkout
-read-only. The diff goes only to the model provider you configure, on your own
-key or seat — there is no hosted reviewer in the loop.
+There is no hosted reviewer in the loop, and the checkout never leaves your
+GitHub Actions runner. What does leave is the diff, plus whatever context the
+reviewing agent requests — sent only to the model provider you configured, on
+your own key or seat.
 
 **What does it cost?**
 The action is MIT-licensed and adds no per-seat or per-review charge. You pay
@@ -305,9 +306,10 @@ only the model you bring — $0 with OpenCode Zen free models or a CLI seat you
 already pay for — plus normal CI minutes.
 
 **Can the action modify my code?**
-No. The checkout is read-only, and the workflow's least-privilege defaults are
-`contents: read` and `pull-requests: write`. On `pull_request` events GitHub
-strips secrets from fork PRs.
+No. The checkout is read-only, and nothing in the example workflows can push
+code: they request `contents: read`, plus `pull-requests: write` (review
+comments), `issues: write` (PR reactions), and `checks: read`. On
+`pull_request` events GitHub strips secrets from fork PRs.
 
 **How is this different from hosted reviewers like CodeRabbit or Greptile?**
 Hosted reviewers run your code through their own servers and charge per seat;
