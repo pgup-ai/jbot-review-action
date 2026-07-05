@@ -4,7 +4,17 @@
 
 # jbot-review-action
 
-Agentic PR reviewer. Drops into any repo with one workflow file.
+**Open-source agentic PR reviewer — drops into any repo with one workflow
+file.** It runs inside your own GitHub Actions, on your runner, with a model
+you already pay for: an [OpenCode](https://opencode.ai/) gateway key (Claude,
+OpenAI, Gemini, DeepSeek, and 28+ backends) or a coding-CLI subscription —
+Codex (ChatGPT Plus/Pro), Cursor, Devin, Cline, Kilo, Command Code. Findings
+are diff-anchored and adversarially verified before they post. **$0 per
+seat** — no reviewer SaaS, no per-review bill.
+
+[Website](https://www.pgupai.com) ·
+[Setup guides](https://www.pgupai.com/guides) ·
+[Reuse your ChatGPT seat →](https://www.pgupai.com/guides/codex-code-review-github-actions)
 
 ## Supported integrations
 
