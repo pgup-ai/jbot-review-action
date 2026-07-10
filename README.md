@@ -194,7 +194,7 @@ final sign-off with a stronger model than the auto-review default:
 | `time-budget-minutes`     | No       | `30`                  | Wall-clock target in minutes; `0` disables budget-derived session timeouts                 |
 | `review-shards`           | No       | `1`                   | Parallel main-review shards. `1` = single full-diff session (default); `0` auto-scales by diff size, capped at 4. Only speeds up on providers with real session concurrency; free/throttled tiers serialize shards on one key |
 | `model-options`           | No       | `{"reasoningEffort":"medium"}` | JSON provider options for the main model; pass `{}` to send none                  |
-| `prompt-cache`            | No       | `true`                | Enable opencode provider prompt caching (`setCacheKey`); cuts input-token cost on models that honor it; models marked unsupported omit the cache key |
+| `prompt-cache`            | No       | `true`                | Prompt caching for OpenCode-server sessions (`setCacheKey`); cuts input-token cost on models that honor it; models marked unsupported omit the cache key. The default pi engine caches provider-side automatically, so this only affects the OpenCode-server path |
 | `skip-doc-only`           | No       | `true`                | Skip the review (no model call) when the PR changes only documentation/diagram assets (`.md`, `.svg`, `.drawio`, `.pdf`, …); the reaction is left unchanged (a docs push does not change the verdict) |
 | `max-concurrent-sessions` | No       | `3`                   | Max model sessions in flight (default `3`); `0` = unlimited                                |
 | `review-telemetry`        | No       | `true`                | Emit per-finding + per-session telemetry to `.jbot-review/telemetry.jsonl`                 |
@@ -310,6 +310,14 @@ No. The checkout is read-only, and nothing in the example workflows can push
 code: they request `contents: read`, plus `pull-requests: write` (review
 comments), `issues: write` (PR reactions), and `checks: read`. On
 `pull_request` events GitHub strips secrets from fork PRs.
+
+**What runs the review under the hood?**
+For model-key providers the reviewing agent runs in-process through the
+[pi](https://pi.dev/) SDK; coding-CLI backends (Codex, Cursor, Devin, Cline,
+Kilo, Command Code) run their own CLI. Either way your checkout stays
+read-only — pi sessions get no shell at all — and the review footer names the
+engine that ran each session (e.g. `via pi`). It's chosen automatically from
+your `provider`; there's nothing to configure.
 
 **How is this different from hosted reviewers like CodeRabbit or Greptile?**
 Hosted reviewers run your code through their own servers and charge per seat;
