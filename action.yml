@@ -47,7 +47,7 @@ inputs:
     required: false
     default: ''
   xai-api-key:
-    description: 'xAI API key. Used when provider or aux-provider is xai.'
+    description: 'xAI API key. Used by xai, or by grok when grok-auth is empty.'
     required: false
     default: ''
   fireworks-api-key:
@@ -76,6 +76,10 @@ inputs:
     default: ''
   cline-auth:
     description: 'Cline CLI auth: the contents of ~/.cline/data/settings/providers.json. Used when provider or active aux-provider is cline or cline-pass.'
+    required: false
+    default: ''
+  grok-auth:
+    description: 'Grok Build CLI account auth: the contents of ~/.grok/auth.json. Preferred over xai-api-key when grok is selected.'
     required: false
     default: ''
   kilo-auth:
@@ -203,6 +207,7 @@ runs:
     INPUT_CURSOR-API-KEY: ${{ inputs.cursor-api-key }}
     INPUT_CODEX-AUTH: ${{ inputs.codex-auth }}
     INPUT_CLINE-AUTH: ${{ inputs.cline-auth }}
+    INPUT_GROK-AUTH: ${{ inputs.grok-auth }}
     INPUT_KILO-AUTH: ${{ inputs.kilo-auth }}
     INPUT_ENABLE-CONTEXT7: ${{ inputs.enable-context7 }}
     INPUT_CONTEXT7-API-KEY: ${{ inputs.context7-api-key }}
