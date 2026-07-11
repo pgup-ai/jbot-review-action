@@ -10,8 +10,8 @@
 **Open-source agentic PR reviewer — drops into any repo with one workflow
 file.** It runs inside your own GitHub Actions, on your runner, with a model
 you already pay for: an [OpenCode](https://opencode.ai/) gateway key (Claude,
-OpenAI, Gemini, DeepSeek, and 28+ backends) or a coding-CLI subscription —
-Codex (ChatGPT Plus/Pro), Cursor, Devin, Cline, Kilo, Command Code. Findings
+OpenAI, Gemini, DeepSeek, and 28+ backends) or a coding-CLI account or subscription —
+Codex (ChatGPT Plus/Pro), Cursor, Devin, Cline, Grok Build, Kilo, Command Code. Findings
 are diff-anchored and adversarially verified before they post. **$0 per
 seat** — no reviewer SaaS, no per-review bill.
 
@@ -36,6 +36,7 @@ gateway plus the shown `model` namespace.
 | <img src="docs/assets/logos/fireworks.svg" width="15" style="vertical-align: -0.125em;" alt=""> Fireworks | `provider: fireworks-ai` | Fully supported |
 | <img src="docs/assets/logos/google.svg" width="15" style="vertical-align: -0.125em;" alt=""> Gemini | `provider: google` | Fully supported |
 | <img src="docs/assets/logos/zai-coding-plan.svg" width="15" style="vertical-align: -0.125em;" alt=""> GLM | `provider: zai-coding-plan` or `provider: opencode-go`, `model: glm-*` | Fully supported |
+| <img src="docs/assets/logos/xai.svg" width="15" style="vertical-align: -0.125em;" alt=""> Grok Build | `provider: grok` | Fully supported |
 | <img src="docs/assets/logos/kilo.svg" width="15" style="vertical-align: -0.125em;" alt=""> Kilo | `provider: kilo` (free gateway default) | Fully supported |
 | <img src="docs/assets/logos/kimi.svg" width="15" style="vertical-align: -0.125em;" alt=""> Kimi | `provider: opencode-go`, `model: moonshotai/kimi-*` | Fully supported |
 | <img src="docs/assets/logos/minimax.svg" width="15" style="vertical-align: -0.125em;" alt=""> MiniMax | `provider: opencode` or `provider: opencode-go`, `model: minimax-*` | Fully supported |
@@ -92,6 +93,7 @@ jobs:
           nvidia-api-key: ${{ secrets.NVIDIA_API_KEY }}
           zai-api-key: ${{ secrets.ZAI_API_KEY }}
           xai-api-key: ${{ secrets.XAI_API_KEY }}
+          grok-auth: ${{ secrets.GROK_AUTH_JSON }}
           fireworks-api-key: ${{ secrets.FIREWORKS_API_KEY }}
           mimo-api-key: ${{ secrets.MIMO_API_KEY }}
           devin-windsurf-api-key: ${{ secrets.DEVIN_WINDSURF_API_KEY }}
@@ -158,7 +160,7 @@ final sign-off with a stronger model than the auto-review default:
 
 | Input                     | Required | Default               | Description                                                                                |
 | ------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
-| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, google, openrouter, nvidia, zai-coding-plan, xai, xiaomi-token-plan-sgp, fireworks-ai, devin, commandcode, cursor, codex, cline, cline-pass, kilo) |
+| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, google, openrouter, nvidia, zai-coding-plan, xai, xiaomi-token-plan-sgp, fireworks-ai, devin, commandcode, cursor, codex, cline, cline-pass, grok, kilo) |
 | `model`                   | No       | Provider default      | Provider model id, optionally prefixed as `provider/model`                                 |
 | `opencode-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `opencode`/`opencode-go`                         |
 | `deepseek-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `deepseek`                                       |
@@ -168,7 +170,7 @@ final sign-off with a stronger model than the auto-review default:
 | `openrouter-api-key`      | No       | —                     | Used when `provider` or `aux-provider` is `openrouter`                                     |
 | `nvidia-api-key`          | No       | —                     | Used when `provider` or `aux-provider` is `nvidia`                                         |
 | `zai-api-key`             | No       | —                     | Used when `provider` or `aux-provider` is `zai-coding-plan`                                |
-| `xai-api-key`             | No       | —                     | Used when `provider` or `aux-provider` is `xai`                                            |
+| `xai-api-key`             | No       | —                     | Used by `xai`, or by `grok` when `grok-auth` is empty                                      |
 | `fireworks-api-key`       | No       | —                     | Used when `provider` or `aux-provider` is `fireworks-ai`                                   |
 | `mimo-api-key`            | No       | —                     | Used when `provider` or `aux-provider` is `xiaomi-token-plan-sgp`                          |
 | `devin-windsurf-api-key`  | No       | —                     | Used when `provider` or active `aux-provider` is `devin`                                   |
@@ -176,6 +178,7 @@ final sign-off with a stronger model than the auto-review default:
 | `cursor-api-key`          | No       | —                     | Used when `provider` or active `aux-provider` is `cursor`                                  |
 | `codex-auth`              | No       | —                     | Codex CLI auth (contents of `~/.codex/auth.json`); used when `provider` or active `aux-provider` is `codex` |
 | `cline-auth`              | No       | —                     | Cline CLI auth (contents of `~/.cline/data/settings/providers.json`); used when `provider` or active `aux-provider` is `cline` / `cline-pass` |
+| `grok-auth`               | No       | —                     | Grok account auth (contents of `~/.grok/auth.json`); preferred over `xai-api-key` when `grok` is selected |
 | `kilo-auth`               | No       | —                     | Kilo CLI auth (contents of `~/.local/share/kilo/auth.json`); used when `provider` or active `aux-provider` is `kilo` |
 | `enable-context7`         | No       | `auto`                | Use Context7 MCP for external contract changes; `auto`, `true`, or `false`                 |
 | `context7-api-key`        | No       | —                     | Optional Context7 key for reliable CI docs lookup                                          |
@@ -202,7 +205,7 @@ final sign-off with a stronger model than the auto-review default:
 | `fail-on-error`           | No       | `true`                | Fail the workflow when review cannot complete                                              |
 
 See [models.dev](https://models.dev/) for the opencode-backed provider model
-catalog. Devin, CommandCode, and Cursor models are managed by their CLI accounts.
+catalog. Devin, CommandCode, Cursor, and Grok Build models are managed by their CLI accounts.
 Use repository or organization Actions variables `JBOT_REVIEW_PROVIDER`,
 `JBOT_REVIEW_MODEL`, `JBOT_AUX_PROVIDER`, and `JBOT_REVIEW_AUX_MODEL` to change
 future review runs without editing workflow YAML.
@@ -239,6 +242,10 @@ backend. The two billing modes are separate providers sharing the one secret; bo
 read-only (`cline --plan --auto-approve false`) and use only the auth token. Set `model`
 as `cline/<type>/<model>` (e.g. `cline/deepseek/deepseek-v4-flash`) or
 `cline-pass/<model>` (e.g. `cline-pass/glm-5.2`); omit it to use each mode's default.
+Use `provider: grok` with `grok-auth` / `GROK_AUTH_JSON` (the contents of
+`~/.grok/auth.json` after `grok login --device-auth`) for the Grok Build CLI backend.
+If both credentials are supplied, account auth takes precedence over `xai-api-key` /
+`XAI_API_KEY`.
 Use `provider: kilo` with `kilo-auth` / `KILO_AUTH_CONTENT` (the contents of
 `~/.local/share/kilo/auth.json`) for the Kilo CLI backend; it defaults to the free
 `kilo/kilo-auto/free` gateway model.
@@ -273,7 +280,7 @@ uses it for auxiliary sessions. If it is not supplied, jbot reuses the review
 provider's key.
 CLI backends cannot reuse opencode-provider keys, and opencode-backed providers
 cannot reuse CLI credentials such as `DEVIN_WINDSURF_API_KEY`,
-`COMMANDCODE_ACCESS_KEY`, or `CURSOR_API_KEY`, so mixed CLI/opencode-backed
+`COMMANDCODE_ACCESS_KEY`, `CURSOR_API_KEY`, or `GROK_AUTH_JSON`, so mixed CLI/opencode-backed
 main+aux configurations must pass both keys.
 
 If `model` is prefixed as `provider/model`, that prefix must match the selected
@@ -287,9 +294,9 @@ matching provider-specific input, such as `opencode-api-key` for
 
 ## FAQ
 
-**Can I use my ChatGPT Plus/Pro, Cursor, or other CLI subscription for code review?**
+**Can I use my ChatGPT Plus/Pro, Cursor, or other CLI account for code review?**
 Yes — that's the point. Codex (via a ChatGPT Plus/Pro `codex login`), Cursor,
-Devin, Cline, Kilo, and Command Code seats all work as review backends. Claude
+Devin, Cline, Grok Build, Kilo, and Command Code accounts all work as review backends. Claude
 runs through your own Anthropic API key or an OpenCode gateway instead — a
 Claude Pro/Max seat is not a supported CI credential today. Per-CLI setup:
 [pgupai.com/guides](https://www.pgupai.com/guides).
@@ -314,7 +321,7 @@ comments), `issues: write` (PR reactions), and `checks: read`. On
 **What runs the review under the hood?**
 For model-key providers the reviewing agent runs in-process through the
 [pi](https://pi.dev/) SDK; coding-CLI backends (Codex, Cursor, Devin, Cline,
-Kilo, Command Code) run their own CLI. Either way your checkout stays
+Grok Build, Kilo, Command Code) run their own CLI. Either way your checkout stays
 read-only — pi sessions get no shell at all — and the review footer names the
 engine that ran each session (e.g. `via pi`). It's chosen automatically from
 your `provider`; there's nothing to configure.
