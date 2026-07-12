@@ -47,7 +47,7 @@ gateway plus the shown `model` namespace.
 | <img src="docs/assets/logos/opencode.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenCode | `provider: opencode` | Fully supported |
 | <img src="docs/assets/logos/opencode-go.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenCode Go | `provider: opencode-go` | Fully supported |
 | <img src="docs/assets/logos/openrouter.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenRouter | `provider: openrouter` | Fully supported |
-| <img src="https://img.alicdn.com/imgextra/i4/O1CN01OQC0dn1xLcdAaRALo_!!6000000006427-2-tps-180-180.png" width="15" style="vertical-align: -0.125em;" alt=""> Qoder | `provider: qoder` | Fully supported |
+| <img src="docs/assets/logos/qoder.svg" width="15" style="vertical-align: -0.125em;" alt=""> Qoder | `provider: qoder` | Fully supported |
 | <img src="docs/assets/logos/qwen.svg" width="15" style="vertical-align: -0.125em;" alt=""> Qwen | `provider: opencode-go`, `model: qwen*` | Fully supported |
 | <img src="docs/assets/logos/vercel.svg" width="15" style="vertical-align: -0.125em;" alt=""> Vercel | `provider: opencode`, `model: vercel/...` | Fully supported |
 | <img src="docs/assets/logos/xai.svg" width="15" style="vertical-align: -0.125em;" alt=""> xAI | `provider: xai` | Fully supported |
