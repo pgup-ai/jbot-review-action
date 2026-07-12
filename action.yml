@@ -70,6 +70,10 @@ inputs:
     description: 'Cursor API key. Used when provider or active aux-provider is cursor.'
     required: false
     default: ''
+  qoder-token:
+    description: 'Qoder personal access token. Used when provider or active aux-provider is qoder.'
+    required: false
+    default: ''
   codex-auth:
     description: 'Codex CLI auth: the contents of ~/.codex/auth.json. Used when provider or active aux-provider is codex.'
     required: false
@@ -205,6 +209,7 @@ runs:
     INPUT_DEVIN-WINDSURF-API-KEY: ${{ inputs.devin-windsurf-api-key }}
     INPUT_COMMANDCODE-ACCESS-KEY: ${{ inputs.commandcode-access-key }}
     INPUT_CURSOR-API-KEY: ${{ inputs.cursor-api-key }}
+    INPUT_QODER-TOKEN: ${{ inputs.qoder-token }}
     INPUT_CODEX-AUTH: ${{ inputs.codex-auth }}
     INPUT_CLINE-AUTH: ${{ inputs.cline-auth }}
     INPUT_GROK-AUTH: ${{ inputs.grok-auth }}

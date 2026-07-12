@@ -11,7 +11,8 @@
 file.** It runs inside your own GitHub Actions, on your runner, with a model
 you already pay for: an [OpenCode](https://opencode.ai/) gateway key (Claude,
 OpenAI, Gemini, DeepSeek, and 28+ backends) or a coding-CLI account or subscription —
-Codex (ChatGPT Plus/Pro), Cursor, Devin, Cline, Grok Build, Kilo, Command Code. Findings
+Codex (ChatGPT Plus/Pro), Cursor, Devin, Cline, Grok Build, Kilo, Command Code,
+or Qoder. Findings
 are diff-anchored and adversarially verified before they post. **$0 per
 seat** — no reviewer SaaS, no per-review bill.
 
@@ -46,6 +47,7 @@ gateway plus the shown `model` namespace.
 | <img src="docs/assets/logos/opencode.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenCode | `provider: opencode` | Fully supported |
 | <img src="docs/assets/logos/opencode-go.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenCode Go | `provider: opencode-go` | Fully supported |
 | <img src="docs/assets/logos/openrouter.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenRouter | `provider: openrouter` | Fully supported |
+| <img src="https://img.alicdn.com/imgextra/i4/O1CN01OQC0dn1xLcdAaRALo_!!6000000006427-2-tps-180-180.png" width="15" style="vertical-align: -0.125em;" alt=""> Qoder | `provider: qoder` | Fully supported |
 | <img src="docs/assets/logos/qwen.svg" width="15" style="vertical-align: -0.125em;" alt=""> Qwen | `provider: opencode-go`, `model: qwen*` | Fully supported |
 | <img src="docs/assets/logos/vercel.svg" width="15" style="vertical-align: -0.125em;" alt=""> Vercel | `provider: opencode`, `model: vercel/...` | Fully supported |
 | <img src="docs/assets/logos/xai.svg" width="15" style="vertical-align: -0.125em;" alt=""> xAI | `provider: xai` | Fully supported |
@@ -99,6 +101,7 @@ jobs:
           devin-windsurf-api-key: ${{ secrets.DEVIN_WINDSURF_API_KEY }}
           commandcode-access-key: ${{ secrets.COMMANDCODE_ACCESS_KEY }}
           cursor-api-key: ${{ secrets.CURSOR_API_KEY }}
+          qoder-token: ${{ secrets.QODER_PERSONAL_ACCESS_TOKEN }}
           enable-context7: auto
           context7-api-key: ${{ secrets.CONTEXT7_API_KEY }}
           # Recall/precision controls (defaults shown): one general pass,
@@ -160,7 +163,7 @@ final sign-off with a stronger model than the auto-review default:
 
 | Input                     | Required | Default               | Description                                                                                |
 | ------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
-| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, google, openrouter, nvidia, zai-coding-plan, xai, xiaomi-token-plan-sgp, fireworks-ai, devin, commandcode, cursor, codex, cline, cline-pass, grok, kilo) |
+| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, google, openrouter, nvidia, zai-coding-plan, xai, xiaomi-token-plan-sgp, fireworks-ai, devin, commandcode, cursor, qoder, codex, cline, cline-pass, grok, kilo) |
 | `model`                   | No       | Provider default      | Provider model id, optionally prefixed as `provider/model`                                 |
 | `opencode-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `opencode`/`opencode-go`                         |
 | `deepseek-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `deepseek`                                       |
@@ -176,6 +179,7 @@ final sign-off with a stronger model than the auto-review default:
 | `devin-windsurf-api-key`  | No       | —                     | Used when `provider` or active `aux-provider` is `devin`                                   |
 | `commandcode-access-key`  | No       | —                     | Used when `provider` or active `aux-provider` is `commandcode`                             |
 | `cursor-api-key`          | No       | —                     | Used when `provider` or active `aux-provider` is `cursor`                                  |
+| `qoder-token`             | No       | —                     | Used when `provider` or active `aux-provider` is `qoder`                                   |
 | `codex-auth`              | No       | —                     | Codex CLI auth (contents of `~/.codex/auth.json`); used when `provider` or active `aux-provider` is `codex` |
 | `cline-auth`              | No       | —                     | Cline CLI auth (contents of `~/.cline/data/settings/providers.json`); used when `provider` or active `aux-provider` is `cline` / `cline-pass` |
 | `grok-auth`               | No       | —                     | Grok account auth (contents of `~/.grok/auth.json`); preferred over `xai-api-key` when `grok` is selected |
@@ -205,7 +209,7 @@ final sign-off with a stronger model than the auto-review default:
 | `fail-on-error`           | No       | `true`                | Fail the workflow when review cannot complete                                              |
 
 See [models.dev](https://models.dev/) for the opencode-backed provider model
-catalog. Devin, CommandCode, Cursor, and Grok Build models are managed by their CLI accounts.
+catalog. Devin, CommandCode, Cursor, Qoder, and Grok Build models are managed by their CLI accounts.
 Use repository or organization Actions variables `JBOT_REVIEW_PROVIDER`,
 `JBOT_REVIEW_MODEL`, `JBOT_AUX_PROVIDER`, and `JBOT_REVIEW_AUX_MODEL` to change
 future review runs without editing workflow YAML.
@@ -219,7 +223,8 @@ action inputs or environment variables:
 from `aux-model` or `JBOT_REVIEW_AUX_MODEL` when set, otherwise the main model.
 Provider API keys can also be supplied through their standard env vars, such as
 `GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `NVIDIA_API_KEY`, `ZAI_API_KEY`,
-`FIREWORKS_API_KEY`, or `DEVIN_WINDSURF_API_KEY`. `opencode-go` uses the same
+`FIREWORKS_API_KEY`, `DEVIN_WINDSURF_API_KEY`, or
+`QODER_PERSONAL_ACCESS_TOKEN`. `opencode-go` uses the same
 `OPENCODE_API_KEY` as
 `opencode`.
 Use `provider: devin` with `devin-windsurf-api-key` /
@@ -232,6 +237,9 @@ value (`user_…`) from `~/.commandcode/auth.json`.
 Use `provider: cursor` with `cursor-api-key` / `CURSOR_API_KEY` for the Cursor
 CLI backend. It authenticates straight from `CURSOR_API_KEY` and runs read-only
 (`cursor-agent --mode plan`).
+Use `provider: qoder` with `qoder-token` / `QODER_PERSONAL_ACCESS_TOKEN` for the
+Qoder CLI backend. It accepts `auto`, `ultimate`, `performance`, `efficient`,
+and `lite` model tiers.
 Use `provider: codex` with `codex-auth` / `CODEX_AUTH_JSON` (the contents of
 `~/.codex/auth.json` from a ChatGPT Plus/Pro `codex login`) for the Codex CLI
 backend. It runs read-only (`codex exec --sandbox read-only`).
@@ -280,7 +288,8 @@ uses it for auxiliary sessions. If it is not supplied, jbot reuses the review
 provider's key.
 CLI backends cannot reuse opencode-provider keys, and opencode-backed providers
 cannot reuse CLI credentials such as `DEVIN_WINDSURF_API_KEY`,
-`COMMANDCODE_ACCESS_KEY`, `CURSOR_API_KEY`, or `GROK_AUTH_JSON`, so mixed CLI/opencode-backed
+`COMMANDCODE_ACCESS_KEY`, `CURSOR_API_KEY`, `QODER_PERSONAL_ACCESS_TOKEN`, or
+`GROK_AUTH_JSON`, so mixed CLI/opencode-backed
 main+aux configurations must pass both keys.
 
 If `model` is prefixed as `provider/model`, that prefix must match the selected
@@ -296,7 +305,7 @@ matching provider-specific input, such as `opencode-api-key` for
 
 **Can I use my ChatGPT Plus/Pro, Cursor, or other CLI account for code review?**
 Yes — that's the point. Codex (via a ChatGPT Plus/Pro `codex login`), Cursor,
-Devin, Cline, Grok Build, Kilo, and Command Code accounts all work as review backends. Claude
+Devin, Cline, Grok Build, Kilo, Command Code, and Qoder accounts all work as review backends. Claude
 runs through your own Anthropic API key or an OpenCode gateway instead — a
 Claude Pro/Max seat is not a supported CI credential today. Per-CLI setup:
 [pgupai.com/guides](https://www.pgupai.com/guides).
@@ -321,7 +330,7 @@ comments), `issues: write` (PR reactions), and `checks: read`. On
 **What runs the review under the hood?**
 For model-key providers the reviewing agent runs in-process through the
 [pi](https://pi.dev/) SDK; coding-CLI backends (Codex, Cursor, Devin, Cline,
-Grok Build, Kilo, Command Code) run their own CLI. Either way your checkout stays
+Grok Build, Kilo, Command Code, Qoder) run their own CLI. Either way your checkout stays
 read-only — pi sessions get no shell at all — and the review footer names the
 engine that ran each session (e.g. `via pi`). It's chosen automatically from
 your `provider`; there's nothing to configure.
