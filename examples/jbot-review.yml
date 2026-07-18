@@ -15,7 +15,7 @@ on:
         required: false
         default: ''
       model:
-        description: 'Provider model id, optionally prefixed as provider/model. Uses provider default if unset.'
+        description: 'Provider model id, optionally prefixed as provider/model. Uses provider default if unset; required for openai-compatible.'
         required: false
         default: ''
       dry-run:
@@ -154,11 +154,14 @@ jobs:
           opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
           deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          openai-compatible-api-key: ${{ secrets.JBOT_OPENAI_COMPATIBLE_API_KEY }}
+          openai-compatible-base-url: ${{ vars.JBOT_OPENAI_COMPATIBLE_BASE_URL }}
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
           openrouter-api-key: ${{ secrets.OPENROUTER_API_KEY }}
           nvidia-api-key: ${{ secrets.NVIDIA_API_KEY }}
           zai-api-key: ${{ secrets.ZAI_API_KEY }}
+          kimi-api-key: ${{ secrets.KIMI_API_KEY }}
           xai-api-key: ${{ secrets.XAI_API_KEY }}
           fireworks-api-key: ${{ secrets.FIREWORKS_API_KEY }}
           mimo-api-key: ${{ secrets.MIMO_API_KEY }}

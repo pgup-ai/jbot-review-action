@@ -11,7 +11,7 @@ inputs:
     required: false
     default: ''
   model:
-    description: 'Provider model id, optionally prefixed as provider/model. Uses provider default if unset.'
+    description: 'Provider model id, optionally prefixed as provider/model. Uses provider default if unset; required for openai-compatible.'
     required: false
     default: ''
   opencode-api-key:
@@ -24,6 +24,14 @@ inputs:
     default: ''
   openai-api-key:
     description: 'OpenAI API key. Used when provider or aux-provider is openai.'
+    required: false
+    default: ''
+  openai-compatible-api-key:
+    description: 'API key for provider openai-compatible. Kept separate from the direct OpenAI key.'
+    required: false
+    default: ''
+  openai-compatible-base-url:
+    description: 'Base URL for provider openai-compatible, including any required API version path.'
     required: false
     default: ''
   anthropic-api-key:
@@ -44,6 +52,10 @@ inputs:
     default: ''
   zai-api-key:
     description: 'Z.AI API key. Used when provider or aux-provider is zai-coding-plan.'
+    required: false
+    default: ''
+  kimi-api-key:
+    description: 'Kimi API key. Used when provider or aux-provider is kimi-for-coding.'
     required: false
     default: ''
   xai-api-key:
@@ -159,9 +171,8 @@ inputs:
     required: false
     default: 'true'
   model-options:
-    description: 'JSON object of provider options for the main model. Defaults to {"reasoningEffort":"medium"} — a balance of depth and latency; raise to high for paid heavy tiers, or pass {} to send no options (e.g. for providers that reject unknown options). Aux-model sessions are unaffected.'
+    description: 'JSON object of provider options for the main model. Native providers default to {"reasoningEffort":"medium"}; custom providers default to {} because arbitrary endpoints may reject unknown options. Aux-model sessions are unaffected.'
     required: false
-    default: '{"reasoningEffort":"medium"}'
   prompt-cache:
     description: 'Enable opencode prompt caching (provider setCacheKey). Parallel shards and re-reviews share an identical prompt prefix, so caching cuts input-token cost on models that honor it; models marked unsupported omit the cache key. Per-session cache hits are logged.'
     required: false
@@ -198,11 +209,14 @@ runs:
     INPUT_OPENCODE-API-KEY: ${{ inputs.opencode-api-key }}
     INPUT_DEEPSEEK-API-KEY: ${{ inputs.deepseek-api-key }}
     INPUT_OPENAI-API-KEY: ${{ inputs.openai-api-key }}
+    INPUT_OPENAI-COMPATIBLE-API-KEY: ${{ inputs.openai-compatible-api-key }}
+    INPUT_OPENAI-COMPATIBLE-BASE-URL: ${{ inputs.openai-compatible-base-url }}
     INPUT_ANTHROPIC-API-KEY: ${{ inputs.anthropic-api-key }}
     INPUT_GEMINI-API-KEY: ${{ inputs.gemini-api-key }}
     INPUT_OPENROUTER-API-KEY: ${{ inputs.openrouter-api-key }}
     INPUT_NVIDIA-API-KEY: ${{ inputs.nvidia-api-key }}
     INPUT_ZAI-API-KEY: ${{ inputs.zai-api-key }}
+    INPUT_KIMI-API-KEY: ${{ inputs.kimi-api-key }}
     INPUT_XAI-API-KEY: ${{ inputs.xai-api-key }}
     INPUT_FIREWORKS-API-KEY: ${{ inputs.fireworks-api-key }}
     INPUT_MIMO-API-KEY: ${{ inputs.mimo-api-key }}

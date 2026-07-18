@@ -39,11 +39,12 @@ gateway plus the shown `model` namespace.
 | <img src="docs/assets/logos/zai-coding-plan.svg" width="15" style="vertical-align: -0.125em;" alt=""> GLM | `provider: zai-coding-plan` or `provider: opencode-go`, `model: glm-*` | Fully supported |
 | <img src="docs/assets/logos/xai.svg" width="15" style="vertical-align: -0.125em;" alt=""> Grok Build | `provider: grok` | Fully supported |
 | <img src="docs/assets/logos/kilo.svg" width="15" style="vertical-align: -0.125em;" alt=""> Kilo | `provider: kilo` (free gateway default) | Fully supported |
-| <img src="docs/assets/logos/kimi.svg" width="15" style="vertical-align: -0.125em;" alt=""> Kimi | `provider: opencode-go`, `model: kimi-*` | Fully supported |
+| <img src="docs/assets/logos/kimi.svg" width="15" style="vertical-align: -0.125em;" alt=""> Kimi | `provider: kimi-for-coding` (Coding Plan API key) or `provider: opencode-go`, `model: kimi-*` | Fully supported |
 | <img src="docs/assets/logos/minimax.svg" width="15" style="vertical-align: -0.125em;" alt=""> MiniMax | `provider: opencode` or `provider: opencode-go`, `model: minimax-*` | Fully supported |
 | <img src="docs/assets/logos/mimo.svg" width="15" style="vertical-align: -0.125em;" alt=""> MiMo | `provider: xiaomi-token-plan-sgp` or `provider: opencode-go`, `model: mimo-*` | Fully supported |
 | <img src="docs/assets/logos/nvidia.svg" width="15" style="vertical-align: -0.125em;" alt=""> NVIDIA | `provider: nvidia` | Fully supported |
 | <img src="docs/assets/logos/openai.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenAI | `provider: openai` | Fully supported |
+| OpenAI-compatible endpoint | `provider: openai-compatible` with an explicit model and base URL | Fully supported |
 | <img src="docs/assets/logos/opencode.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenCode | `provider: opencode` | Fully supported |
 | <img src="docs/assets/logos/opencode-go.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenCode Go | `provider: opencode-go` | Fully supported |
 | <img src="docs/assets/logos/openrouter.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenRouter | `provider: openrouter` | Fully supported |
@@ -89,11 +90,14 @@ jobs:
           opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
           deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          openai-compatible-api-key: ${{ secrets.JBOT_OPENAI_COMPATIBLE_API_KEY }}
+          openai-compatible-base-url: ${{ vars.JBOT_OPENAI_COMPATIBLE_BASE_URL }}
           anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
           openrouter-api-key: ${{ secrets.OPENROUTER_API_KEY }}
           nvidia-api-key: ${{ secrets.NVIDIA_API_KEY }}
           zai-api-key: ${{ secrets.ZAI_API_KEY }}
+          kimi-api-key: ${{ secrets.KIMI_API_KEY }}
           xai-api-key: ${{ secrets.XAI_API_KEY }}
           grok-auth: ${{ secrets.GROK_AUTH_JSON }}
           fireworks-api-key: ${{ secrets.FIREWORKS_API_KEY }}
@@ -163,16 +167,19 @@ final sign-off with a stronger model than the auto-review default:
 
 | Input                     | Required | Default               | Description                                                                                |
 | ------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
-| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, anthropic, google, openrouter, nvidia, zai-coding-plan, xai, xiaomi-token-plan-sgp, fireworks-ai, devin, commandcode, cursor, qoder, codex, cline, cline-pass, grok, kilo) |
-| `model`                   | No       | Provider default      | Provider model id, optionally prefixed as `provider/model`                                 |
+| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, openai-compatible, anthropic, google, openrouter, nvidia, zai-coding-plan, kimi-for-coding, xai, xiaomi-token-plan-sgp, fireworks-ai, devin, commandcode, cursor, qoder, codex, cline, cline-pass, grok, kilo) |
+| `model`                   | No       | Provider default      | Provider model id, optionally prefixed as `provider/model`; required for `openai-compatible` |
 | `opencode-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `opencode`/`opencode-go`                         |
 | `deepseek-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `deepseek`                                       |
 | `openai-api-key`          | No       | —                     | Used when `provider` or `aux-provider` is `openai`                                         |
+| `openai-compatible-api-key` | No     | —                     | Namespaced key for `openai-compatible`                                                     |
+| `openai-compatible-base-url` | No    | —                     | Required endpoint URL for `openai-compatible`                                              |
 | `anthropic-api-key`       | No       | —                     | Used when `provider` or `aux-provider` is `anthropic`                                      |
 | `gemini-api-key`          | No       | —                     | Used when `provider` or `aux-provider` is `google`                                         |
 | `openrouter-api-key`      | No       | —                     | Used when `provider` or `aux-provider` is `openrouter`                                     |
 | `nvidia-api-key`          | No       | —                     | Used when `provider` or `aux-provider` is `nvidia`                                         |
 | `zai-api-key`             | No       | —                     | Used when `provider` or `aux-provider` is `zai-coding-plan`                                |
+| `kimi-api-key`            | No       | —                     | Used when `provider` or `aux-provider` is `kimi-for-coding`                                |
 | `xai-api-key`             | No       | —                     | Used by `xai`, or by `grok` when `grok-auth` is empty                                      |
 | `fireworks-api-key`       | No       | —                     | Used when `provider` or `aux-provider` is `fireworks-ai`                                   |
 | `mimo-api-key`            | No       | —                     | Used when `provider` or `aux-provider` is `xiaomi-token-plan-sgp`                          |
@@ -200,7 +207,7 @@ final sign-off with a stronger model than the auto-review default:
 | `verify-findings`         | No       | `true`                | Re-check blocking findings before posting; uncertain findings become advisory              |
 | `time-budget-minutes`     | No       | `30`                  | Wall-clock target in minutes; `0` disables budget-derived session timeouts                 |
 | `review-shards`           | No       | `1`                   | Parallel main-review shards. `1` = single full-diff session (default); `0` auto-scales by diff size, capped at 4. Only speeds up on providers with real session concurrency; free/throttled tiers serialize shards on one key |
-| `model-options`           | No       | `{"reasoningEffort":"medium"}` | JSON provider options for the main model; pass `{}` to send none                  |
+| `model-options`           | No       | Provider-dependent    | JSON options for the main model; native providers default to `{"reasoningEffort":"medium"}`, custom providers to `{}` |
 | `prompt-cache`            | No       | `true`                | Prompt caching for OpenCode-server sessions (`setCacheKey`); cuts input-token cost on models that honor it; models marked unsupported omit the cache key. The default pi engine caches provider-side automatically, so this only affects the OpenCode-server path |
 | `skip-doc-only`           | No       | `true`                | Skip the review (no model call) when the PR changes only documentation/diagram assets (`.md`, `.svg`, `.drawio`, `.pdf`, …); the reaction is left unchanged (a docs push does not change the verdict) |
 | `max-concurrent-sessions` | No       | `3`                   | Max model sessions in flight (default `3`); `0` = unlimited                                |
@@ -208,8 +215,8 @@ final sign-off with a stronger model than the auto-review default:
 | `evidence-quotes`         | No       | `true`                | Ask each finding to carry a verbatim quote of the changed line it flags                    |
 | `fail-on-error`           | No       | `true`                | Fail the workflow when review cannot complete                                              |
 
-See [models.dev](https://models.dev/) for the opencode-backed provider model
-catalog. Devin, CommandCode, Cursor, Qoder, and Grok Build models are managed by their CLI accounts.
+See the generated [J-Bot model ID catalog](https://github.com/pgup-ai/jbot-review/blob/main/MODEL_CATALOG.md)
+for current Models.dev and CLI-backed model IDs.
 Use repository or organization Actions variables `JBOT_REVIEW_PROVIDER`,
 `JBOT_REVIEW_MODEL`, `JBOT_AUX_PROVIDER`, and `JBOT_REVIEW_AUX_MODEL` to change
 future review runs without editing workflow YAML.
@@ -223,10 +230,38 @@ action inputs or environment variables:
 from `aux-model` or `JBOT_REVIEW_AUX_MODEL` when set, otherwise the main model.
 Provider API keys can also be supplied through their standard env vars, such as
 `GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `NVIDIA_API_KEY`, `ZAI_API_KEY`,
-`FIREWORKS_API_KEY`, `DEVIN_WINDSURF_API_KEY`, or
-`QODER_PERSONAL_ACCESS_TOKEN`. `opencode-go` uses the same
+`KIMI_API_KEY`, `JBOT_OPENAI_COMPATIBLE_API_KEY`, `FIREWORKS_API_KEY`,
+`DEVIN_WINDSURF_API_KEY`, or `QODER_PERSONAL_ACCESS_TOKEN`. Custom endpoints
+also read `JBOT_OPENAI_COMPATIBLE_BASE_URL`. `opencode-go` uses the same
 `OPENCODE_API_KEY` as
 `opencode`.
+Use `provider: kimi-for-coding` with `kimi-api-key` / `KIMI_API_KEY` for the
+native Kimi Coding Plan provider. Its current default is `kimi-for-coding/k3`:
+
+```yaml
+with:
+  provider: kimi-for-coding
+  kimi-api-key: ${{ secrets.KIMI_API_KEY }}
+```
+
+For an arbitrary OpenAI-compatible endpoint, provide the model, namespaced key,
+and base URL explicitly:
+
+```yaml
+with:
+  provider: openai-compatible
+  model: openai-compatible/my-served-model
+  openai-compatible-api-key: ${{ secrets.JBOT_OPENAI_COMPATIBLE_API_KEY }}
+  openai-compatible-base-url: ${{ vars.JBOT_OPENAI_COMPATIBLE_BASE_URL }}
+```
+
+These settings never fall back to `OPENAI_API_KEY` or `OPENAI_BASE_URL`, so the
+direct `openai` provider remains isolated. J-Bot omits `setCacheKey` for both
+providers; generic endpoints may reject that extra request field, and Kimi's
+catalog does not advertise support for it. When `openai-compatible` is the
+auxiliary provider, pass its namespaced key and base URL alongside
+`aux-provider` and `aux-model`.
+
 Use `provider: devin` with `devin-windsurf-api-key` /
 `DEVIN_WINDSURF_API_KEY` for the Devin CLI backend — the secret is the
 `windsurf_api_key` value (`devin-session-token$…`) from
@@ -328,12 +363,12 @@ comments), `issues: write` (PR reactions), and `checks: read`. On
 `pull_request` events GitHub strips secrets from fork PRs.
 
 **What runs the review under the hood?**
-For model-key providers the reviewing agent runs in-process through the
-[pi](https://pi.dev/) SDK; coding-CLI backends (Codex, Cursor, Devin, Cline,
-Grok Build, Kilo, Command Code, Qoder) run their own CLI. Either way your checkout stays
-read-only — pi sessions get no shell at all — and the review footer names the
-engine that ran each session (e.g. `via pi`). It's chosen automatically from
-your `provider`; there's nothing to configure.
+Model-key providers route automatically through the in-process
+[pi](https://pi.dev/) SDK when supported and the OpenCode server otherwise;
+`kimi-for-coding` and `openai-compatible` use OpenCode. Coding-CLI backends
+(Codex, Cursor, Devin, Cline, Grok Build, Kilo, Command Code, Qoder) run their
+own CLI. Every path remains read-only, and the review footer names the engine
+that ran each session.
 
 **How is this different from hosted reviewers like CodeRabbit or Greptile?**
 Hosted reviewers run your code through their own servers and charge per seat;
