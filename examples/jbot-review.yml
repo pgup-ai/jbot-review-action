@@ -149,6 +149,7 @@ jobs:
           # Precedence: /jbot comment flag > dispatch input > repo variable > default.
           provider: ${{ needs.command.outputs.provider || inputs.provider || vars.JBOT_REVIEW_PROVIDER || 'opencode' }}
           model: ${{ needs.command.outputs.model || inputs.model || vars.JBOT_REVIEW_MODEL || '' }}
+          sdk-engine: ${{ vars.JBOT_SDK_ENGINE || '' }}
           pr-number: ${{ github.event.pull_request.number || inputs['pr-number'] || github.event.issue.number }}
           dry-run: ${{ inputs['dry-run'] || 'false' }}
           opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
