@@ -87,6 +87,7 @@ jobs:
         with:
           provider: ${{ vars.JBOT_REVIEW_PROVIDER || 'opencode' }}
           model: ${{ vars.JBOT_REVIEW_MODEL || '' }}
+          sdk-engine: ${{ vars.JBOT_SDK_ENGINE || '' }}
           opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
           deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
@@ -169,6 +170,7 @@ final sign-off with a stronger model than the auto-review default:
 | ------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
 | `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, openai-compatible, anthropic, google, openrouter, nvidia, zai-coding-plan, kimi-for-coding, xai, xiaomi-token-plan-sgp, fireworks-ai, devin, commandcode, cursor, qoder, codex, cline, cline-pass, grok, kilo) |
 | `model`                   | No       | Provider default      | Provider model id, optionally prefixed as `provider/model`; required for `openai-compatible` |
+| `sdk-engine`              | No       | `auto`                | `auto` uses pi for cataloged models; `opencode` pins SDK sessions to OpenCode               |
 | `opencode-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `opencode`/`opencode-go`                         |
 | `deepseek-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `deepseek`                                       |
 | `openai-api-key`          | No       | —                     | Used when `provider` or `aux-provider` is `openai`                                         |
@@ -218,8 +220,9 @@ final sign-off with a stronger model than the auto-review default:
 See the generated [J-Bot model ID catalog](https://github.com/pgup-ai/jbot-review/blob/main/MODEL_CATALOG.md)
 for current Models.dev and CLI-backed model IDs.
 Use repository or organization Actions variables `JBOT_REVIEW_PROVIDER`,
-`JBOT_REVIEW_MODEL`, `JBOT_AUX_PROVIDER`, and `JBOT_REVIEW_AUX_MODEL` to change
-future review runs without editing workflow YAML.
+`JBOT_REVIEW_MODEL`, `JBOT_SDK_ENGINE`, `JBOT_AUX_PROVIDER`, and
+`JBOT_REVIEW_AUX_MODEL` to change future review runs without editing workflow
+YAML.
 The action uses the key matching the selected `provider`, plus the aux provider
 key when one is configured and supplied. The example can pass multiple provider
 secrets and leave unused ones empty. It accepts provider and model from either
@@ -364,11 +367,12 @@ comments), `issues: write` (PR reactions), and `checks: read`. On
 
 **What runs the review under the hood?**
 Model-key providers route automatically through the in-process
-[pi](https://pi.dev/) SDK when supported and the OpenCode server otherwise;
-`kimi-for-coding` and `openai-compatible` use OpenCode. Coding-CLI backends
-(Codex, Cursor, Devin, Cline, Grok Build, Kilo, Command Code, Qoder) run their
-own CLI. Every path remains read-only, and the review footer names the engine
-that ran each session.
+[pi](https://pi.dev/) SDK when its catalog contains the selected model and the
+OpenCode server otherwise; `kimi-for-coding` and `openai-compatible` use
+OpenCode. Set `sdk-engine: opencode` to pin all SDK sessions to OpenCode.
+Coding-CLI backends (Codex, Cursor, Devin, Cline, Grok Build, Kilo, Command
+Code, Qoder) run their own CLI. Every path remains read-only, and the review
+footer names the engine that ran each session.
 
 **How is this different from hosted reviewers like CodeRabbit or Greptile?**
 Hosted reviewers run your code through their own servers and charge per seat;

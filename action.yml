@@ -14,6 +14,10 @@ inputs:
     description: 'Provider model id, optionally prefixed as provider/model. Uses provider default if unset; required for openai-compatible.'
     required: false
     default: ''
+  sdk-engine:
+    description: 'SDK routing: auto uses pi when its catalog has the selected model, otherwise opencode; opencode pins every SDK session to opencode.'
+    required: false
+    default: ''
   opencode-api-key:
     description: 'OpenCode API key. Used when provider or aux-provider is opencode/opencode-go.'
     required: false
@@ -206,6 +210,7 @@ runs:
   env:
     INPUT_PROVIDER: ${{ inputs.provider }}
     INPUT_MODEL: ${{ inputs.model }}
+    INPUT_SDK-ENGINE: ${{ inputs.sdk-engine }}
     INPUT_OPENCODE-API-KEY: ${{ inputs.opencode-api-key }}
     INPUT_DEEPSEEK-API-KEY: ${{ inputs.deepseek-api-key }}
     INPUT_OPENAI-API-KEY: ${{ inputs.openai-api-key }}
