@@ -86,6 +86,10 @@ inputs:
     description: 'Cursor API key. Used when provider or active aux-provider is cursor.'
     required: false
     default: ''
+  poolside-api-key:
+    description: 'Poolside API key. Used when provider or active aux-provider is poolside.'
+    required: false
+    default: ''
   qoder-token:
     description: 'Qoder personal access token. Used when provider or active aux-provider is qoder.'
     required: false
@@ -175,7 +179,7 @@ inputs:
     required: false
     default: 'true'
   model-options:
-    description: 'JSON object of provider options for the main model. Native providers default to {"reasoningEffort":"medium"}; custom providers default to {} because arbitrary endpoints may reject unknown options. Aux-model sessions are unaffected.'
+    description: 'JSON object of provider options for the main model. Native providers default to {"reasoningEffort":"medium"}; Poolside uses {"reasoningEffort":"default"} to leave reasoning provider-managed; custom providers default to {} because arbitrary endpoints may reject unknown options. Aux-model sessions are unaffected.'
     required: false
   prompt-cache:
     description: 'Enable opencode prompt caching (provider setCacheKey). Parallel shards and re-reviews share an identical prompt prefix, so caching cuts input-token cost on models that honor it; models marked unsupported omit the cache key. Per-session cache hits are logged.'
@@ -228,6 +232,7 @@ runs:
     INPUT_DEVIN-WINDSURF-API-KEY: ${{ inputs.devin-windsurf-api-key }}
     INPUT_COMMANDCODE-ACCESS-KEY: ${{ inputs.commandcode-access-key }}
     INPUT_CURSOR-API-KEY: ${{ inputs.cursor-api-key }}
+    INPUT_POOLSIDE-API-KEY: ${{ inputs.poolside-api-key }}
     INPUT_QODER-TOKEN: ${{ inputs.qoder-token }}
     INPUT_CODEX-AUTH: ${{ inputs.codex-auth }}
     INPUT_CLINE-AUTH: ${{ inputs.cline-auth }}

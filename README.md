@@ -10,9 +10,9 @@
 **Open-source agentic PR reviewer — drops into any repo with one workflow
 file.** It runs inside your own GitHub Actions, on your runner, with a model
 you already pay for: an [OpenCode](https://opencode.ai/) gateway key (Claude,
-OpenAI, Gemini, DeepSeek, and 28+ backends) or a coding-CLI account or subscription —
-Codex (ChatGPT Plus/Pro), Cursor, Devin, Cline, Grok Build, Kilo, Command Code,
-or Qoder. Findings
+OpenAI, Gemini, DeepSeek, and 28+ backends), a Poolside API key, or a coding-CLI
+account or subscription — Codex (ChatGPT Plus/Pro), Cursor, Devin, Cline, Grok
+Build, Kilo, Command Code, or Qoder. Findings
 are diff-anchored and adversarially verified before they post. **$0 per
 seat** — no reviewer SaaS, no per-review bill.
 
@@ -48,6 +48,7 @@ gateway plus the shown `model` namespace.
 | <img src="docs/assets/logos/opencode.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenCode | `provider: opencode` | Fully supported |
 | <img src="docs/assets/logos/opencode-go.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenCode Go | `provider: opencode-go` | Fully supported |
 | <img src="docs/assets/logos/openrouter.svg" width="15" style="vertical-align: -0.125em;" alt=""> OpenRouter | `provider: openrouter` | Fully supported |
+| Poolside | `provider: poolside` | Fully supported |
 | <img src="docs/assets/logos/qoder.svg" width="15" style="vertical-align: -0.125em;" alt=""> Qoder | `provider: qoder` | Fully supported |
 | <img src="docs/assets/logos/qwen.svg" width="15" style="vertical-align: -0.125em;" alt=""> Qwen | `provider: opencode-go`, `model: qwen*` | Fully supported |
 | <img src="docs/assets/logos/vercel.svg" width="15" style="vertical-align: -0.125em;" alt=""> Vercel | `provider: opencode`, `model: vercel/...` | Fully supported |
@@ -106,6 +107,7 @@ jobs:
           devin-windsurf-api-key: ${{ secrets.DEVIN_WINDSURF_API_KEY }}
           commandcode-access-key: ${{ secrets.COMMANDCODE_ACCESS_KEY }}
           cursor-api-key: ${{ secrets.CURSOR_API_KEY }}
+          poolside-api-key: ${{ secrets.POOLSIDE_API_KEY }}
           qoder-token: ${{ secrets.QODER_PERSONAL_ACCESS_TOKEN }}
           enable-context7: auto
           context7-api-key: ${{ secrets.CONTEXT7_API_KEY }}
@@ -168,7 +170,7 @@ final sign-off with a stronger model than the auto-review default:
 
 | Input                     | Required | Default               | Description                                                                                |
 | ------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
-| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, openai-compatible, anthropic, google, openrouter, nvidia, zai-coding-plan, kimi-for-coding, xai, xiaomi-token-plan-sgp, fireworks-ai, devin, commandcode, cursor, qoder, codex, cline, cline-pass, grok, kilo) |
+| `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, openai-compatible, anthropic, google, openrouter, nvidia, zai-coding-plan, kimi-for-coding, xai, xiaomi-token-plan-sgp, fireworks-ai, poolside, devin, commandcode, cursor, qoder, codex, cline, cline-pass, grok, kilo) |
 | `model`                   | No       | Provider default      | Provider model id, optionally prefixed as `provider/model`; required for `openai-compatible` |
 | `sdk-engine`              | No       | `auto`                | `auto` uses pi for cataloged models; `opencode` pins SDK sessions to OpenCode               |
 | `opencode-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `opencode`/`opencode-go`                         |
@@ -188,6 +190,7 @@ final sign-off with a stronger model than the auto-review default:
 | `devin-windsurf-api-key`  | No       | —                     | Used when `provider` or active `aux-provider` is `devin`                                   |
 | `commandcode-access-key`  | No       | —                     | Used when `provider` or active `aux-provider` is `commandcode`                             |
 | `cursor-api-key`          | No       | —                     | Used when `provider` or active `aux-provider` is `cursor`                                  |
+| `poolside-api-key`        | No       | —                     | Used when `provider` or active `aux-provider` is `poolside`                                |
 | `qoder-token`             | No       | —                     | Used when `provider` or active `aux-provider` is `qoder`                                   |
 | `codex-auth`              | No       | —                     | Codex CLI auth (contents of `~/.codex/auth.json`); used when `provider` or active `aux-provider` is `codex` |
 | `cline-auth`              | No       | —                     | Cline CLI auth (contents of `~/.cline/data/settings/providers.json`); used when `provider` or active `aux-provider` is `cline` / `cline-pass` |
@@ -209,7 +212,7 @@ final sign-off with a stronger model than the auto-review default:
 | `verify-findings`         | No       | `true`                | Re-check blocking findings before posting; uncertain findings become advisory              |
 | `time-budget-minutes`     | No       | `30`                  | Wall-clock target in minutes; `0` disables budget-derived session timeouts                 |
 | `review-shards`           | No       | `1`                   | Parallel main-review shards. `1` = single full-diff session (default); `0` auto-scales by diff size, capped at 4. Only speeds up on providers with real session concurrency; free/throttled tiers serialize shards on one key |
-| `model-options`           | No       | Provider-dependent    | JSON options for the main model; native providers default to `{"reasoningEffort":"medium"}`, custom providers to `{}` |
+| `model-options`           | No       | Provider-dependent    | JSON options for the main model; native providers default to `{"reasoningEffort":"medium"}`, Poolside uses `{"reasoningEffort":"default"}`, and custom providers use `{}` |
 | `prompt-cache`            | No       | `true`                | Prompt caching for OpenCode-server sessions (`setCacheKey`); cuts input-token cost on models that honor it; models marked unsupported omit the cache key. The default pi engine caches provider-side automatically, so this only affects the OpenCode-server path |
 | `skip-doc-only`           | No       | `true`                | Skip the review (no model call) when the PR changes only documentation/diagram assets (`.md`, `.svg`, `.drawio`, `.pdf`, …); the reaction is left unchanged (a docs push does not change the verdict) |
 | `max-concurrent-sessions` | No       | `3`                   | Max model sessions in flight (default `3`); `0` = unlimited                                |
@@ -233,7 +236,8 @@ action inputs or environment variables:
 from `aux-model` or `JBOT_REVIEW_AUX_MODEL` when set, otherwise the main model.
 Provider API keys can also be supplied through their standard env vars, such as
 `GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `NVIDIA_API_KEY`, `ZAI_API_KEY`,
-`KIMI_API_KEY`, `JBOT_OPENAI_COMPATIBLE_API_KEY`, `FIREWORKS_API_KEY`,
+`KIMI_API_KEY`, `POOLSIDE_API_KEY`, `JBOT_OPENAI_COMPATIBLE_API_KEY`,
+`FIREWORKS_API_KEY`,
 `DEVIN_WINDSURF_API_KEY`, or `QODER_PERSONAL_ACCESS_TOKEN`. Custom endpoints
 also read `JBOT_OPENAI_COMPATIBLE_BASE_URL`. `opencode-go` uses the same
 `OPENCODE_API_KEY` as
@@ -275,6 +279,10 @@ value (`user_…`) from `~/.commandcode/auth.json`.
 Use `provider: cursor` with `cursor-api-key` / `CURSOR_API_KEY` for the Cursor
 CLI backend. It authenticates straight from `CURSOR_API_KEY` and runs read-only
 (`cursor-agent --mode plan`).
+Use `provider: poolside` with `poolside-api-key` / `POOLSIDE_API_KEY` for the
+Poolside inference provider. Its default model is `poolside/laguna-s-2.1`, and
+reasoning stays provider-managed unless `model-options.reasoningEffort` overrides
+it.
 Use `provider: qoder` with `qoder-token` / `QODER_PERSONAL_ACCESS_TOKEN` for the
 Qoder CLI backend. It accepts `auto`, `ultimate`, `performance`, `efficient`,
 and `lite` model tiers.
@@ -369,7 +377,8 @@ comments), `issues: write` (PR reactions), and `checks: read`. On
 Model-key providers route automatically through the in-process
 [pi](https://pi.dev/) SDK when its catalog contains the selected model and the
 OpenCode server otherwise; `kimi-for-coding` and `openai-compatible` use
-OpenCode. Set `sdk-engine: opencode` to pin all SDK sessions to OpenCode.
+OpenCode, while Poolside uses its direct chat-completions backend. Set
+`sdk-engine: opencode` to pin all eligible SDK sessions to OpenCode.
 Coding-CLI backends (Codex, Cursor, Devin, Cline, Grok Build, Kilo, Command
 Code, Qoder) run their own CLI. Every path remains read-only, and the review
 footer names the engine that ran each session.
