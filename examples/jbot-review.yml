@@ -93,7 +93,7 @@ jobs:
             esac
           done
           if [ "$bad" = true ] || [ "$seen_cmd" = false ]; then
-            echo "::error::Not a /jbot command; expected '/jbot [--provider=<id>] [--model=<id>]' as the first line."
+            echo "::error::Not a /jbot command; expected '/jbot [--provider=<id>] [--model=<id>]' as the first line. A model pool is comma-separated with no spaces."
             exit 1
           fi
           if printf '%s\n' "$COMMENT_BODY" | tail -n +2 | grep -qE -- '--(provider|model)='; then
