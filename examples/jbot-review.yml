@@ -15,7 +15,7 @@ on:
         required: false
         default: ''
       model:
-        description: 'Provider model id, optionally prefixed as provider/model. Uses provider default if unset; required for openai-compatible.'
+        description: 'Provider model id, optionally prefixed as provider/model, or a comma-separated pool of same-provider models. Uses provider default if unset; required for openai-compatible.'
         required: false
         default: ''
       dry-run:
@@ -53,6 +53,8 @@ jobs:
       provider: ${{ steps.cmd.outputs.provider }}
       model: ${{ steps.cmd.outputs.model }}
     steps:
+      # Mirror of the parser in jbot-review's own .github/workflows/jbot-review.yml.
+      # The two repos don't share it — keep them in sync by hand.
       - name: Parse /jbot command
         id: cmd
         env:
@@ -71,7 +73,12 @@ jobs:
             case "$tok" in
               --provider=* | --model=*)
                 key="${tok%%=*}" val="${tok#*=}"
-                case "$val" in
+                # Only --model takes a pool, so its separators come out before the
+                # character check — a comma stays invalid in a provider id, and
+                # widening the class would have let one hide a metacharacter.
+                check="$val"
+                if [ "$key" = '--model' ]; then check="${val//,/}"; fi
+                case "$check" in
                   '') echo "::warning::/jbot: $key has an empty value; using the repo default" ;;
                   *[!A-Za-z0-9._:/-]*) echo "::warning::/jbot: ignoring $key value with unsupported characters; using the repo default" ;;
                   *) if [ "$key" = '--provider' ]; then provider="$val"; else model="$val"; fi ;;
@@ -86,7 +93,7 @@ jobs:
             esac
           done
           if [ "$bad" = true ] || [ "$seen_cmd" = false ]; then
-            echo "::error::Not a /jbot command; expected '/jbot [--provider=<id>] [--model=<id>]' as the first line."
+            echo "::error::Not a /jbot command; expected '/jbot [--provider=<id>] [--model=<id>]' as the first line. A model pool is comma-separated with no spaces."
             exit 1
           fi
           if printf '%s\n' "$COMMENT_BODY" | tail -n +2 | grep -qE -- '--(provider|model)='; then

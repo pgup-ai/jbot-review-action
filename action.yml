@@ -11,7 +11,7 @@ inputs:
     required: false
     default: ''
   model:
-    description: 'Provider model id, optionally prefixed as provider/model. Uses provider default if unset; required for openai-compatible.'
+    description: 'Provider model id, optionally prefixed as provider/model. A comma-separated list is a pool of same-provider models; each run picks one by PR head sha. Uses provider default if unset; required for openai-compatible.'
     required: false
     default: ''
   sdk-engine:
@@ -151,7 +151,7 @@ inputs:
     required: false
     default: 'true'
   aux-model:
-    description: 'Model for auxiliary sessions (addressed-thread check, guideline compliance, finding verification). Uses aux-provider/JBOT_AUX_PROVIDER when set, otherwise the main provider. Uses the main model when unset.'
+    description: 'Model for auxiliary sessions (addressed-thread check, guideline compliance, finding verification). One model, not a pool. Uses aux-provider/JBOT_AUX_PROVIDER when set, otherwise the main provider. Uses the main model when unset.'
     required: false
     default: ''
   aux-provider:
