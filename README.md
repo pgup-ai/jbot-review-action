@@ -171,7 +171,7 @@ final sign-off with a stronger model than the auto-review default:
 | Input                     | Required | Default               | Description                                                                                |
 | ------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------ |
 | `provider`                | No       | `opencode`            | LLM provider (opencode, opencode-go, deepseek, openai, openai-compatible, anthropic, google, openrouter, nvidia, zai-coding-plan, kimi-for-coding, xai, xiaomi-token-plan-sgp, fireworks-ai, poolside, devin, commandcode, cursor, qoder, codex, cline, cline-pass, grok, kilo) |
-| `model`                   | No       | Provider default      | Provider model id, optionally prefixed as `provider/model`; required for `openai-compatible` |
+| `model`                   | No       | Provider default      | Provider model id, optionally prefixed as `provider/model`, or a comma-separated pool of same-provider models; required for `openai-compatible` |
 | `sdk-engine`              | No       | `auto`                | `auto` uses pi for cataloged models; `opencode` pins SDK sessions to OpenCode               |
 | `opencode-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `opencode`/`opencode-go`                         |
 | `deepseek-api-key`        | No       | —                     | Used when `provider` or `aux-provider` is `deepseek`                                       |
@@ -231,7 +231,21 @@ key when one is configured and supplied. The example can pass multiple provider
 secrets and leave unused ones empty. It accepts provider and model from either
 action inputs or environment variables:
 `provider` or `JBOT_REVIEW_PROVIDER` for the provider, and `model` or
-`JBOT_REVIEW_MODEL` for the model. Auxiliary sessions use `aux-provider` or
+`JBOT_REVIEW_MODEL` for the model.
+
+A comma-separated `model` is a pool of same-provider models: each run reviews
+with one candidate, chosen by hashing the PR head sha. Load spreads across the
+pool as PRs and pushes come in, while re-reviewing the same commit always picks
+the same model, so a rerun reproduces. All candidates share the one provider
+credential, and every candidate is validated before the review starts. The chosen
+model is logged and appears in the posted review's metadata block. `aux-model`
+stays single-valued.
+
+```yaml
+model: deepseek-v4-flash-free,glm-5.2-free,kimi-k2.6-free
+```
+
+Auxiliary sessions use `aux-provider` or
 `JBOT_AUX_PROVIDER` when set, otherwise the main provider. Their model comes
 from `aux-model` or `JBOT_REVIEW_AUX_MODEL` when set, otherwise the main model.
 Provider API keys can also be supplied through their standard env vars, such as
