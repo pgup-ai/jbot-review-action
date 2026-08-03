@@ -11,11 +11,11 @@ on:
         description: Pull request number to review
         required: true
       provider:
-        description: 'LLM provider. Uses JBOT_REVIEW_PROVIDER or opencode if unset.'
+        description: 'Deprecated — name the provider in model instead. Pins the provider when set.'
         required: false
         default: ''
       model:
-        description: 'Provider model id, optionally prefixed as provider/model, or a comma-separated pool of same-provider models. Uses provider default if unset; required for openai-compatible.'
+        description: 'Model as provider/model, or a comma-separated pool naming one provider. Uses the provider default if unset (opencode when nothing names one); required for openai-compatible.'
         required: false
         default: ''
       dry-run:
@@ -153,8 +153,10 @@ jobs:
 
       - uses: pgup-ai/jbot-review-action@v0
         with:
-          # Precedence: /jbot comment flag > dispatch input > repo variable > default.
-          provider: ${{ needs.command.outputs.provider || inputs.provider || vars.JBOT_REVIEW_PROVIDER || 'opencode' }}
+          # Precedence: /jbot comment flag > dispatch input > repo variable.
+          # provider is deprecated — a qualified model selects its own provider.
+          # Leave it empty unless you need the legacy pinning behavior.
+          provider: ${{ needs.command.outputs.provider || inputs.provider || vars.JBOT_REVIEW_PROVIDER || '' }}
           model: ${{ needs.command.outputs.model || inputs.model || vars.JBOT_REVIEW_MODEL || '' }}
           sdk-engine: ${{ vars.JBOT_SDK_ENGINE || '' }}
           pr-number: ${{ github.event.pull_request.number || inputs['pr-number'] || github.event.issue.number }}
@@ -185,9 +187,10 @@ jobs:
           enable-context7: auto
           context7-api-key: ${{ secrets.CONTEXT7_API_KEY }}
           # Recall/precision controls (defaults shown): one general pass,
-          # blocking findings adversarially verified before posting. Set
-          # aux-provider + aux-model can run auxiliary sessions on a cheaper
-          # provider/model when the main model is a stronger tier.
+          # blocking findings adversarially verified before posting.
+          # A qualified aux-model (e.g. deepseek/deepseek-v4-flash) runs the
+          # auxiliary sessions on the provider it names — useful when the main
+          # model is a stronger tier and these checks can stay cheap and fast.
           review-passes: '1'
           verify-findings: 'true'
           aux-provider: ${{ vars.JBOT_AUX_PROVIDER || '' }}
