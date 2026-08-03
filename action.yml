@@ -7,11 +7,11 @@ branding:
 
 inputs:
   provider:
-    description: 'LLM provider. Defaults to opencode when unset.'
+    description: 'Deprecated — name the provider in model instead. When set it pins the provider for model and aux-model, keeping the previous resolution exactly. Defaults to opencode when neither names one.'
     required: false
     default: ''
   model:
-    description: 'Provider model id, optionally prefixed as provider/model. A comma-separated list is a pool of same-provider models; each run picks one by PR head sha. Uses provider default if unset; required for openai-compatible.'
+    description: 'Model as provider/model, e.g. opencode/deepseek-v4-flash-free. Only the first segment selects the provider; the rest is that provider''s own model id and may itself contain slashes (kilo/zai/glm-5.2). A comma-separated list is a pool, which must name one provider; each run picks one by PR head sha. Uses the provider default if unset; required for openai-compatible.'
     required: false
     default: ''
   sdk-engine:
@@ -19,15 +19,15 @@ inputs:
     required: false
     default: ''
   opencode-api-key:
-    description: 'OpenCode API key. Used when provider or aux-provider is opencode/opencode-go.'
+    description: 'OpenCode API key. Used when the main or aux model names opencode/opencode-go.'
     required: false
     default: ''
   deepseek-api-key:
-    description: 'DeepSeek API key. Used when provider or aux-provider is deepseek.'
+    description: 'DeepSeek API key. Used when the main or aux model names deepseek.'
     required: false
     default: ''
   openai-api-key:
-    description: 'OpenAI API key. Used when provider or aux-provider is openai.'
+    description: 'OpenAI API key. Used when the main or aux model names openai.'
     required: false
     default: ''
   openai-compatible-api-key:
@@ -39,27 +39,27 @@ inputs:
     required: false
     default: ''
   anthropic-api-key:
-    description: 'Anthropic API key. Used when provider or aux-provider is anthropic.'
+    description: 'Anthropic API key. Used when the main or aux model names anthropic.'
     required: false
     default: ''
   gemini-api-key:
-    description: 'Gemini API key. Used when provider or aux-provider is google.'
+    description: 'Gemini API key. Used when the main or aux model names google.'
     required: false
     default: ''
   openrouter-api-key:
-    description: 'OpenRouter API key. Used when provider or aux-provider is openrouter.'
+    description: 'OpenRouter API key. Used when the main or aux model names openrouter.'
     required: false
     default: ''
   nvidia-api-key:
-    description: 'NVIDIA API key. Used when provider or aux-provider is nvidia.'
+    description: 'NVIDIA API key. Used when the main or aux model names nvidia.'
     required: false
     default: ''
   zai-api-key:
-    description: 'Z.AI API key. Used when provider or aux-provider is zai-coding-plan.'
+    description: 'Z.AI API key. Used when the main or aux model names zai-coding-plan.'
     required: false
     default: ''
   kimi-api-key:
-    description: 'Kimi API key. Used when provider or aux-provider is kimi-for-coding.'
+    description: 'Kimi API key. Used when the main or aux model names kimi-for-coding.'
     required: false
     default: ''
   xai-api-key:
@@ -67,39 +67,39 @@ inputs:
     required: false
     default: ''
   fireworks-api-key:
-    description: 'Fireworks AI API key. Used when provider or aux-provider is fireworks-ai.'
+    description: 'Fireworks AI API key. Used when the main or aux model names fireworks-ai.'
     required: false
     default: ''
   mimo-api-key:
-    description: 'Xiaomi MiMo Token Plan API key (tp-… / sk-…). Used when provider or aux-provider is xiaomi-token-plan-sgp.'
+    description: 'Xiaomi MiMo Token Plan API key (tp-… / sk-…). Used when the main or aux model names xiaomi-token-plan-sgp.'
     required: false
     default: ''
   devin-windsurf-api-key:
-    description: 'Devin/Windsurf API key. Used when provider or active aux-provider is devin.'
+    description: 'Devin/Windsurf API key. Used when the main or aux model names devin.'
     required: false
     default: ''
   commandcode-access-key:
-    description: 'CommandCode CLI access key. Used when provider or active aux-provider is commandcode.'
+    description: 'CommandCode CLI access key. Used when the main or aux model names commandcode.'
     required: false
     default: ''
   cursor-api-key:
-    description: 'Cursor API key. Used when provider or active aux-provider is cursor.'
+    description: 'Cursor API key. Used when the main or aux model names cursor.'
     required: false
     default: ''
   poolside-api-key:
-    description: 'Poolside API key. Used when provider or active aux-provider is poolside.'
+    description: 'Poolside API key. Used when the main or aux model names poolside.'
     required: false
     default: ''
   qoder-token:
-    description: 'Qoder personal access token. Used when provider or active aux-provider is qoder.'
+    description: 'Qoder personal access token. Used when the main or aux model names qoder.'
     required: false
     default: ''
   codex-auth:
-    description: 'Codex CLI auth: the contents of ~/.codex/auth.json. Used when provider or active aux-provider is codex.'
+    description: 'Codex CLI auth: the contents of ~/.codex/auth.json. Used when the main or aux model names codex.'
     required: false
     default: ''
   cline-auth:
-    description: 'Cline CLI auth: the contents of ~/.cline/data/settings/providers.json. Used when provider or active aux-provider is cline or cline-pass.'
+    description: 'Cline CLI auth: the contents of ~/.cline/data/settings/providers.json. Used when the main or aux model names cline or cline-pass.'
     required: false
     default: ''
   grok-auth:
@@ -107,7 +107,7 @@ inputs:
     required: false
     default: ''
   kilo-auth:
-    description: 'Kilo CLI auth: the contents of ~/.local/share/kilo/auth.json. Used when provider or active aux-provider is kilo.'
+    description: 'Kilo CLI auth: the contents of ~/.local/share/kilo/auth.json. Used when the main or aux model names kilo.'
     required: false
     default: ''
   enable-context7:
@@ -151,11 +151,11 @@ inputs:
     required: false
     default: 'true'
   aux-model:
-    description: 'Model for auxiliary sessions (addressed-thread check, guideline compliance, finding verification). One model, not a pool. Uses aux-provider/JBOT_AUX_PROVIDER when set, otherwise the main provider. Uses the main model when unset.'
+    description: 'Model for auxiliary sessions (addressed-thread check, guideline compliance, finding verification), as provider/model. One model, not a pool. An id that names no provider stays on the main provider. Uses the main model when unset.'
     required: false
     default: ''
   aux-provider:
-    description: 'Optional provider for aux-model. Defaults to provider/JBOT_REVIEW_PROVIDER when unset.'
+    description: 'Deprecated — name the provider in aux-model instead. When set it pins the provider for aux-model, keeping the previous resolution exactly.'
     required: false
     default: ''
   review-passes:
