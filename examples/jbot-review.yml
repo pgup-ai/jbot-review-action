@@ -189,7 +189,8 @@ jobs:
           # Recall/precision controls (defaults shown): one general pass,
           # blocking findings adversarially verified before posting.
           # A qualified aux-model (e.g. deepseek/deepseek-v4-flash) runs the
-          # auxiliary sessions on a cheaper provider than the main model.
+          # auxiliary sessions on the provider it names — useful when the main
+          # model is a stronger tier and these checks can stay cheap and fast.
           review-passes: '1'
           verify-findings: 'true'
           aux-provider: ${{ vars.JBOT_AUX_PROVIDER || '' }}
