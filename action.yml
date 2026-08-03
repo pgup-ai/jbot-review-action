@@ -11,7 +11,7 @@ inputs:
     required: false
     default: ''
   model:
-    description: 'Model as provider/model, e.g. opencode/deepseek-v4-flash-free. Only the first segment selects the provider; the rest is that provider''s own model id and may itself contain slashes (kilo/zai/glm-5.2). A comma-separated list is a pool, which must name one provider; each run picks one by PR head sha. Uses the provider default if unset; required for openai-compatible.'
+    description: "Model as provider/model, e.g. opencode/deepseek-v4-flash-free. Only the first segment selects the provider; the rest is that provider's own model id and may itself contain slashes (kilo/zai/glm-5.2). A comma-separated list is a pool; each run picks one by PR head sha. Candidates may name different providers, and every provider they draw on needs its own key. Uses the provider default if unset; required for openai-compatible."
     required: false
     default: ''
   sdk-engine:
@@ -151,7 +151,7 @@ inputs:
     required: false
     default: 'true'
   aux-model:
-    description: 'Model for auxiliary sessions (addressed-thread check, guideline compliance, finding verification), as provider/model. Accepts a comma-separated same-provider pool like model, picked per PR head sha. An id that names no provider stays on the main provider. Uses the main model when unset.'
+    description: 'Model for auxiliary sessions (recall lens passes, addressed-thread check, guideline compliance, finding verification), as provider/model, or a comma-separated pool picked per PR head sha; pool candidates may name different providers. An id that names no provider belongs to aux-provider when set, else to the deprecated provider pin when that is set, else to the main model this run picked. Uses the main model when unset.'
     required: false
     default: ''
   aux-provider:
@@ -179,7 +179,7 @@ inputs:
     required: false
     default: 'true'
   model-options:
-    description: 'JSON object of provider options for the main model. Native providers default to {"reasoningEffort":"medium"}; Poolside uses {"reasoningEffort":"default"} to leave reasoning provider-managed; custom providers default to {} because arbitrary endpoints may reject unknown options. Aux-model sessions are unaffected.'
+    description: 'JSON object of provider options for the main model. Native providers default to {"reasoningEffort":"medium"}; Poolside uses {"reasoningEffort":"default"} to leave reasoning provider-managed; custom providers default to {} because arbitrary endpoints may reject unknown options. Governs the main model only. An auxiliary session running a model of its own gets the same treatment one tier lower, since it sits on the tail of the run: {"reasoningEffort":"low"} on native providers, {"reasoningEffort":"default"} on Poolside, {} on custom ones. An aux-model that is the main model shares its entry and its effort, as does an aux model sharing a pi runtime with the main one — pi carries one thinking level per runtime.'
     required: false
   prompt-cache:
     description: 'Enable opencode prompt caching (provider setCacheKey). Parallel shards and re-reviews share an identical prompt prefix, so caching cuts input-token cost on models that honor it; models marked unsupported omit the cache key. Per-session cache hits are logged.'
