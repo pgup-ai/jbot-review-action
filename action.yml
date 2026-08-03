@@ -151,7 +151,7 @@ inputs:
     required: false
     default: 'true'
   aux-model:
-    description: 'Model for auxiliary sessions (addressed-thread check, guideline compliance, finding verification), as provider/model. One model, not a pool. An id that names no provider stays on the main provider. Uses the main model when unset.'
+    description: 'Model for auxiliary sessions (addressed-thread check, guideline compliance, finding verification), as provider/model. Accepts a comma-separated same-provider pool like model, picked per PR head sha. An id that names no provider stays on the main provider. Uses the main model when unset.'
     required: false
     default: ''
   aux-provider:

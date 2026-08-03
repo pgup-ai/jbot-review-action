@@ -210,7 +210,7 @@ final sign-off with a stronger model than the auto-review default:
 | `min-severity`               | No       | `nit`                 | Minimum severity to include: `P0`, `P1`, `P2`, `P3`, or `nit`                                                                                                                                                                                                                                                                                                         |
 | `include-prior-comments`     | No       | `true`                | Include prior PR review comments in context                                                                                                                                                                                                                                                                                                                           |
 | `enable-guideline-pass`      | No       | `true`                | Run a dedicated guideline-compliance pass when repository guidelines are discovered                                                                                                                                                                                                                                                                                   |
-| `aux-model`                  | No       | —                     | Auxiliary-session model as `provider/model`; an id naming no provider stays on the main provider; uses the main model when unset                                                                                                                                                                                                                                      |
+| `aux-model`                  | No       | —                     | Auxiliary-session model as `provider/model`, or a same-provider pool like `model`; an id naming no provider stays on the main provider; uses the main model when unset                                                                                                                                                                                                |
 | `aux-provider`               | No       | from `aux-model`      | Deprecated — qualify `aux-model` instead; pins only the aux provider when set (`JBOT_AUX_PROVIDER`)                                                                                                                                                                                                                                                                   |
 | `review-passes`              | No       | `1`                   | Total review passes, 1-3. Raise to 2-3 for extra recall lenses                                                                                                                                                                                                                                                                                                        |
 | `verify-findings`            | No       | `true`                | Re-check blocking findings before posting; uncertain findings become advisory                                                                                                                                                                                                                                                                                         |
@@ -242,7 +242,11 @@ pushes come in, while re-reviewing the same commit always picks the same model,
 so a rerun reproduces. All candidates must name the same provider — the pool
 shares its one credential — and every candidate is validated before the review
 starts. The chosen model is logged and appears in the posted review's metadata
-block. `aux-model` stays single-valued.
+block.
+
+`aux-model` takes a pool on the same terms. Its pick is salted, so setting both
+inputs to the same list still varies the pair instead of always drawing the
+same two entries.
 
 ```yaml
 model: opencode/deepseek-v4-flash-free,opencode/glm-5-free,opencode/kimi-k2.5-free
