@@ -3,7 +3,7 @@ name: J-Bot Code Review
 on:
   pull_request:
     types: [opened, reopened, ready_for_review, synchronize]
-  issue_comment: # one-off reviews: "/jbot [--provider=<id>] [--model=<id>]" on a PR
+  issue_comment: # one-off reviews: "/jbot [--provider=<id>] [--model=<id>] [--auto-approve[=true|false]]" on a PR
     types: [created]
   workflow_dispatch:
     inputs:
@@ -52,6 +52,7 @@ jobs:
       proceed: ${{ steps.ok.outputs.proceed }}
       provider: ${{ steps.cmd.outputs.provider }}
       model: ${{ steps.cmd.outputs.model }}
+      auto_approve: ${{ steps.cmd.outputs.auto_approve }}
     steps:
       # Mirror of the parser in jbot-review's own .github/workflows/jbot-review.yml.
       # The two repos don't share it — keep them in sync by hand.
@@ -63,7 +64,7 @@ jobs:
         run: |
           set -f # no globbing: prose tokens like * must stay literal
           first_line="$(printf '%s\n' "$COMMENT_BODY" | head -n1 | tr -d '\r')"
-          provider='' model='' seen_cmd=false bad=false
+          provider='' model='' auto_approve='' seen_cmd=false bad=false
           for tok in $first_line; do
             if [ "$seen_cmd" = false ]; then
               [ "$tok" = '/jbot' ] || bad=true
@@ -84,8 +85,21 @@ jobs:
                   *) if [ "$key" = '--provider' ]; then provider="$val"; else model="$val"; fi ;;
                 esac
                 ;;
+              --auto-approve)
+                auto_approve=true
+                ;;
+              --auto-approve=*)
+                val="${tok#*=}"
+                case "$val" in
+                  true | false) auto_approve="$val" ;;
+                  *)
+                    echo "::error::/jbot: --auto-approve expects true or false"
+                    bad=true
+                    ;;
+                esac
+                ;;
               --*)
-                echo "::error::/jbot: unknown flag ${tok%%=*}; supported: --provider=<id> --model=<id>"
+                echo "::error::/jbot: unknown flag ${tok%%=*}; supported: --provider=<id> --model=<id> --auto-approve[=true|false]"
                 bad=true
                 ;;
               # Prose mentions ("/jbot is failing...") must not burn a review run.
@@ -93,17 +107,18 @@ jobs:
             esac
           done
           if [ "$bad" = true ] || [ "$seen_cmd" = false ]; then
-            echo "::error::Not a /jbot command; expected '/jbot [--provider=<id>] [--model=<id>]' as the first line. A model pool is comma-separated with no spaces."
+            echo "::error::Not a /jbot command; expected '/jbot [--provider=<id>] [--model=<id>] [--auto-approve[=true|false]]' as the first line. A model pool is comma-separated with no spaces."
             exit 1
           fi
-          if printf '%s\n' "$COMMENT_BODY" | tail -n +2 | grep -qE -- '--(provider|model)='; then
+          if printf '%s\n' "$COMMENT_BODY" | tail -n +2 | grep -qE -- '--(provider|model)=|--auto-approve(=|[[:space:]]|$)'; then
             echo "::warning::/jbot: flags after the first line are ignored"
           fi
           {
             echo "provider=$provider"
             echo "model=$model"
+            echo "auto_approve=$auto_approve"
           } >> "$GITHUB_OUTPUT"
-          echo "/jbot overrides: provider='${provider:-<unset>}' model='${model:-<unset>}'"
+          echo "/jbot overrides: provider='${provider:-<unset>}' model='${model:-<unset>}' auto-approve='${auto_approve:-<unset>}'"
       # Fork-head PRs are refused by default: a /jbot run reviews the fork's
       # code with YOUR provider keys and a write-scoped token in the container
       # env. Delete this step to allow it — see "One-off reviews" in the README.
@@ -161,6 +176,7 @@ jobs:
           sdk-engine: ${{ vars.JBOT_SDK_ENGINE || '' }}
           pr-number: ${{ github.event.pull_request.number || inputs['pr-number'] || github.event.issue.number }}
           dry-run: ${{ inputs['dry-run'] || 'false' }}
+          auto-approve: ${{ needs.command.outputs.auto_approve || vars.JBOT_AUTO_APPROVE || 'false' }}
           opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
           deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
