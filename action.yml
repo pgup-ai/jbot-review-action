@@ -123,7 +123,7 @@ inputs:
     required: true
     default: ${{ github.token }}
   thread-resolution-token:
-    description: 'Optional token used only to resolve addressed review threads. Falls back to github-token when unset.'
+    description: 'Optional token used to resolve addressed review threads and minimize completed reviews. Falls back to github-token when unset.'
     required: false
     default: ''
   pr-number:
@@ -132,6 +132,10 @@ inputs:
     default: ''
   dry-run:
     description: 'Log the review body and inline comments without posting to GitHub.'
+    required: false
+    default: 'false'
+  auto-approve:
+    description: 'Approve an open, non-draft, mergeable PR when its exact reviewed head has no new or open jbot findings.'
     required: false
     default: 'false'
   max-findings:
@@ -206,6 +210,12 @@ inputs:
     required: false
     default: 'true'
 
+outputs:
+  findings-posted:
+    description: 'Findings posted (or logged in dry-run) by this run. Unset when the review fails before completing.'
+  terminal-state:
+    description: 'completed when the review pipeline finished; failed when it aborted. Run-level coverage detail lands in .jbot-review/telemetry.jsonl — upload it as a workflow artifact to keep history.'
+
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/pgup-ai/jbot-review:latest'
@@ -244,6 +254,7 @@ runs:
     INPUT_THREAD-RESOLUTION-TOKEN: ${{ inputs.thread-resolution-token }}
     INPUT_PR-NUMBER: ${{ inputs.pr-number }}
     INPUT_DRY-RUN: ${{ inputs.dry-run }}
+    INPUT_AUTO-APPROVE: ${{ inputs.auto-approve }}
     INPUT_MAX-FINDINGS: ${{ inputs.max-findings }}
     INPUT_MIN-SEVERITY: ${{ inputs.min-severity }}
     INPUT_INCLUDE-PRIOR-COMMENTS: ${{ inputs.include-prior-comments }}

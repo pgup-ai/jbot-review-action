@@ -90,6 +90,7 @@ jobs:
           provider: ${{ vars.JBOT_REVIEW_PROVIDER || '' }}
           model: ${{ vars.JBOT_REVIEW_MODEL || '' }} # e.g. opencode/deepseek-v4-flash-free
           sdk-engine: ${{ vars.JBOT_SDK_ENGINE || '' }}
+          auto-approve: ${{ vars.JBOT_AUTO_APPROVE || 'false' }}
           opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
           deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
@@ -132,16 +133,20 @@ above) also lets you trigger a one-off review by commenting on a PR — say, a
 final sign-off with a stronger model than the auto-review default:
 
 ```
-/jbot --model=devin/glm-5.2
+/jbot --model=devin/glm-5.2 --auto-approve
 ```
 
-- Both flags are optional. A flag you pass overrides the repo variable
+- All flags are optional. A flag you pass overrides the repo variable
   (`JBOT_REVIEW_MODEL`, or `JBOT_REVIEW_PROVIDER` for the deprecated
   `--provider`); a flag you omit falls back to it. A qualified `--model`
   selects the backend on its own, so `--provider` is only for legacy pinning.
+  Bare `--auto-approve` is equivalent to `--auto-approve=true`; explicit
+  `--auto-approve=false` overrides an enabled `JBOT_AUTO_APPROVE` default for
+  that run.
   Bare `/jbot` re-runs the review with your configured defaults. The
   command is the first line of the comment: `/jbot` followed only by
-  `--provider=<id>` / `--model=<id>` flags. Anything else on that line —
+  `--provider=<id>`, `--model=<id>`, and `--auto-approve[=true|false]` flags.
+  Anything else on that line —
   prose like "/jbot is failing", or an unknown flag — rejects the command
   without spending a review, and lines after the first are ignored.
 - A qualified `--model` switches the **provider too** — `--model=devin/glm-5.2`
@@ -203,9 +208,10 @@ final sign-off with a stronger model than the auto-review default:
 | `enable-context7`            | No       | `auto`                | Use Context7 MCP for external contract changes; `auto`, `true`, or `false`                                                                                                                                                                                                                                                                                            |
 | `context7-api-key`           | No       | —                     | Optional Context7 key for reliable CI docs lookup                                                                                                                                                                                                                                                                                                                     |
 | `github-token`               | Yes      | `${{ github.token }}` | Token for posting the review                                                                                                                                                                                                                                                                                                                                          |
-| `thread-resolution-token`    | No       | —                     | Optional token used only to resolve addressed review threads                                                                                                                                                                                                                                                                                                          |
+| `thread-resolution-token`    | No       | —                     | Optional token for resolving threads and minimizing completed reviews                                                                                                                                                                                                                                                                                                 |
 | `pr-number`                  | No       | —                     | PR number for manual `workflow_dispatch` runs                                                                                                                                                                                                                                                                                                                         |
 | `dry-run`                    | No       | `false`               | Log review output without posting comments                                                                                                                                                                                                                                                                                                                            |
+| `auto-approve`               | No       | `false`               | Approve an eligible exact reviewed head when no new or open jbot findings remain                                                                                                                                                                                                                                                                                      |
 | `max-findings`               | No       | `0`                   | Maximum findings to post; `0` means no limit                                                                                                                                                                                                                                                                                                                          |
 | `min-severity`               | No       | `nit`                 | Minimum severity to include: `P0`, `P1`, `P2`, `P3`, or `nit`                                                                                                                                                                                                                                                                                                         |
 | `include-prior-comments`     | No       | `true`                | Include prior PR review comments in context                                                                                                                                                                                                                                                                                                                           |
@@ -223,6 +229,18 @@ final sign-off with a stronger model than the auto-review default:
 | `review-telemetry`           | No       | `true`                | Emit per-finding + per-session telemetry to `.jbot-review/telemetry.jsonl`                                                                                                                                                                                                                                                                                            |
 | `evidence-quotes`            | No       | `true`                | Ask each finding to carry a verbatim quote of the changed line it flags                                                                                                                                                                                                                                                                                               |
 | `fail-on-error`              | No       | `true`                | Fail the workflow when review cannot complete                                                                                                                                                                                                                                                                                                                         |
+
+## Outputs
+
+| Output            | Description                                                                         |
+| ----------------- | ----------------------------------------------------------------------------------- |
+| `findings-posted` | Findings posted, or logged in dry-run. Unset if the review fails before completing. |
+| `terminal-state`  | `completed` when the review pipeline finishes; `failed` when it aborts.             |
+
+With `auto-approve: true`, a clean run approves only the exact reviewed head
+when every prior jbot thread is resolved and GitHub reports the PR open,
+non-draft, and mergeable. Branch protection, required checks, and other merge
+requirements still apply.
 
 See the generated [J-Bot model ID catalog](https://github.com/pgup-ai/jbot-review/blob/main/MODEL_CATALOG.md)
 for current Models.dev and CLI-backed model IDs.
