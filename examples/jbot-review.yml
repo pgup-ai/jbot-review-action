@@ -300,7 +300,9 @@ jobs:
           retention-days: 14
       - name: Save shard cache
         # always(): a failed run's completed shards are what the re-run reuses.
-        # Cache keys are immutable, hence the run-scoped suffix.
+        # Cache keys are immutable, so each run saves under its own suffix; the
+        # restore step's shorter keys prefix-match it. Never exact-match the
+        # restore key here — the second run at a head could then not save.
         if: always()
         continue-on-error: true
         uses: actions/cache/save@v4
