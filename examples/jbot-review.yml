@@ -1,9 +1,8 @@
 name: J-Bot Code Review
-
 on:
   pull_request:
     types: [opened, reopened, ready_for_review, synchronize]
-  issue_comment: # one-off reviews: "/jbot [--provider=<id>] [--model=<id>] [--auto-approve[=true|false]]" on a PR
+  issue_comment: # one-off reviews: "/jbot [--provider=<id>] [--model=<id>] [--auto-approve[=true|false]]"
     types: [created]
   workflow_dispatch:
     inputs:
@@ -11,17 +10,37 @@ on:
         description: Pull request number to review
         required: true
       provider:
-        description: 'Deprecated — name the provider in model instead. Pins the provider when set.'
+        description: 'Deprecated — name the provider in model instead. Pins both models when set.'
         required: false
         default: ''
       model:
-        description: 'Model as provider/model, or a comma-separated pool naming one provider. Uses the provider default if unset (opencode when nothing names one); required for openai-compatible.'
+        description: 'Model as provider/model, or a comma-separated pool (providers may differ). Uses the provider default if unset (opencode when nothing names one); required for openai-compatible.'
         required: false
         default: ''
       dry-run:
         description: Log review output without posting to GitHub
         required: false
         default: 'false'
+      max-findings:
+        description: Maximum number of findings to post or log. Use 0 for no limit.
+        required: false
+        default: '0'
+      min-severity:
+        description: 'Minimum severity to include: P0, P1, P2, P3, or nit'
+        required: false
+        default: nit
+      include-prior-comments:
+        description: Include prior PR review comments in context
+        required: false
+        default: 'true'
+      enable-context7:
+        description: 'Use Context7 MCP for external API/SDK/framework/workflow changes: auto, true, or false'
+        required: false
+        default: auto
+      fail-on-error:
+        description: Fail the workflow when review cannot complete
+        required: false
+        default: 'true'
 
 permissions:
   contents: read
@@ -165,18 +184,78 @@ jobs:
           # issue_comment and workflow_dispatch run on the default branch, so
           # explicitly check out the PR head they target.
           ref: ${{ github.event.pull_request.head.sha || format('refs/pull/{0}/head', inputs['pr-number'] || github.event.issue.number) }}
-
-      - uses: pgup-ai/jbot-review-action@v0
+      # issue_comment and workflow_dispatch carry no pull_request payload, so
+      # the base the companion deepens to has to be looked up for those events.
+      - id: base
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number || inputs['pr-number'] || github.event.issue.number }}
+          EVENT_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          sha="$EVENT_BASE"
+          # Fail open: without a base the companion just keeps its initial depth,
+          # which must not cost the whole review.
+          [ -n "$sha" ] || sha=$(gh api "repos/${{ github.repository }}/pulls/$PR" --jq .base.sha || true)
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+      # Same-head re-runs reuse completed shard results instead of re-billing
+      # them. Entries are content-addressed (head, model, exact prompt bytes),
+      # so a cross-head restore is a harmless miss — full-diff coverage holds.
+      - uses: actions/cache/restore@v4
         with:
-          # Precedence: /jbot comment flag > dispatch input > repo variable.
-          # provider is deprecated — a qualified model selects its own provider.
-          # Leave it empty unless you need the legacy pinning behavior.
+          path: ${{ runner.temp }}/jbot-shard-cache
+          key: jbot-shard-${{ github.event.pull_request.number || inputs['pr-number'] || github.event.issue.number }}-${{ github.event.pull_request.head.sha || github.run_id }}
+          restore-keys: |
+            jbot-shard-${{ github.event.pull_request.number || inputs['pr-number'] || github.event.issue.number }}-${{ github.event.pull_request.head.sha || github.run_id }}-
+            jbot-shard-${{ github.event.pull_request.number || inputs['pr-number'] || github.event.issue.number }}-
+      - uses: pgup-ai/jbot-review-action@v0
+        # Observer tee: streams ACP session frames to the live viewer.
+        # Fail-open by design, and a no-op when the secrets are absent (forks):
+        # an empty JBOT_OBSERVER_URL leaves the tee disabled.
+        env:
+          JBOT_OBSERVER_URL: ${{ secrets.OBSERVER_HOSTNAME && format('https://{0}', secrets.OBSERVER_HOSTNAME) || '' }}
+          JBOT_OBSERVER_TOKEN: ${{ secrets.JBOT_OBSERVER_TOKEN }}
+          # ACP gateway thin client: when set, ACP providers run on a remote
+          # companion's logged-in agent and need no provider key here. Absent
+          # secrets leave the URL empty, which keeps the local-CLI path.
+          # The ref is a SHA, never a branch name, so nothing here is
+          # attacker-controlled text.
+          JBOT_ACP_GATEWAY_URL: ${{ secrets.JBOT_ACP_GATEWAY_URL }}
+          JBOT_ACP_GATEWAY_TOKEN: ${{ secrets.JBOT_ACP_GATEWAY_TOKEN }}
+          JBOT_ACP_GATEWAY_ENDPOINT: ${{ vars.JBOT_ACP_GATEWAY_ENDPOINT }}
+          JBOT_ACP_GATEWAY_REPO: ${{ github.event.repository.clone_url }}
+          # Same resolution the checkout step uses: pull_request carries the
+          # head SHA, while issue_comment/workflow_dispatch resolve the PR ref.
+          JBOT_ACP_GATEWAY_REF: ${{ github.event.pull_request.head.sha || format('refs/pull/{0}/head', inputs['pr-number'] || github.event.issue.number) }}
+          JBOT_ACP_GATEWAY_BASE: ${{ steps.base.outputs.sha }}
+          # One run id per invocation (run+attempt), not per PR: re-reviews of a
+          # PR share a runId otherwise, and the gateway's append+seq-dedup
+          # journal then drops the newer transcript as already-seen.
+          JBOT_OBSERVER_RUN: ${{ github.repository }}-pr-${{ github.event.pull_request.number || inputs['pr-number'] || github.event.issue.number }}-${{ github.run_id }}-${{ github.run_attempt }}
+        with:
+          # Precedence: /jbot comment flag > dispatch input > repo variable > default.
           provider: ${{ needs.command.outputs.provider || inputs.provider || vars.JBOT_REVIEW_PROVIDER || '' }}
           model: ${{ needs.command.outputs.model || inputs.model || vars.JBOT_REVIEW_MODEL || '' }}
           sdk-engine: ${{ vars.JBOT_SDK_ENGINE || '' }}
           pr-number: ${{ github.event.pull_request.number || inputs['pr-number'] || github.event.issue.number }}
           dry-run: ${{ inputs['dry-run'] || 'false' }}
           auto-approve: ${{ needs.command.outputs.auto_approve || vars.JBOT_AUTO_APPROVE || 'false' }}
+          max-findings: ${{ inputs['max-findings'] || '0' }}
+          min-severity: ${{ inputs['min-severity'] || 'nit' }}
+          include-prior-comments: ${{ inputs['include-prior-comments'] || 'true' }}
+          aux-provider: ${{ vars.JBOT_AUX_PROVIDER || '' }}
+          aux-model: ${{ vars.JBOT_REVIEW_AUX_MODEL || '' }}
+          review-passes: ${{ vars.JBOT_REVIEW_PASSES || '1' }}
+          verify-findings: ${{ vars.JBOT_VERIFY_FINDINGS || 'true' }}
+          time-budget-minutes: ${{ vars.JBOT_TIME_BUDGET_MINUTES || '30' }}
+          review-shards: ${{ vars.JBOT_REVIEW_SHARDS || '1' }}
+          model-options: ${{ vars.JBOT_MODEL_OPTIONS || '' }}
+          prompt-cache: ${{ vars.JBOT_PROMPT_CACHE || 'true' }}
+          skip-doc-only: ${{ vars.JBOT_SKIP_DOC_ONLY || 'true' }}
+          max-concurrent-sessions: ${{ vars.JBOT_MAX_CONCURRENT_SESSIONS || '0' }}
+          review-telemetry: ${{ vars.JBOT_REVIEW_TELEMETRY || 'true' }}
+          evidence-quotes: ${{ vars.JBOT_EVIDENCE_QUOTES || 'true' }}
+          enable-context7: ${{ inputs['enable-context7'] || 'auto' }}
+          fail-on-error: ${{ inputs['fail-on-error'] || 'true' }}
           opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
           deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
@@ -200,16 +279,25 @@ jobs:
           cline-auth: ${{ secrets.CLINE_AUTH_JSON }}
           grok-auth: ${{ secrets.GROK_AUTH_JSON }}
           kilo-auth: ${{ secrets.KILO_AUTH_CONTENT }}
-          enable-context7: auto
           context7-api-key: ${{ secrets.CONTEXT7_API_KEY }}
-          # Recall/precision controls (defaults shown): one general pass,
-          # blocking findings adversarially verified before posting.
-          # A qualified aux-model (e.g. deepseek/deepseek-v4-flash) runs the
-          # auxiliary sessions on the provider it names — useful when the main
-          # model is a stronger tier and these checks can stay cheap and fast.
-          review-passes: '1'
-          verify-findings: 'true'
-          aux-provider: ${{ vars.JBOT_AUX_PROVIDER || '' }}
-          aux-model: ${{ vars.JBOT_REVIEW_AUX_MODEL || '' }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           thread-resolution-token: ${{ secrets.JBOT_REVIEW_THREAD_RESOLUTION_TOKEN }}
+      - name: Upload review telemetry
+        if: always()
+        # Telemetry is fail-open end to end: an upload error must not fail the review job.
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: jbot-review-telemetry
+          path: .jbot-review/telemetry.jsonl
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Save shard cache
+        # always(): a failed run's completed shards are what the re-run reuses.
+        # Cache keys are immutable, hence the run-scoped suffix.
+        if: always()
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/jbot-shard-cache
+          key: jbot-shard-${{ github.event.pull_request.number || inputs['pr-number'] || github.event.issue.number }}-${{ github.event.pull_request.head.sha || github.run_id }}-${{ github.run_id }}-${{ github.run_attempt }}
