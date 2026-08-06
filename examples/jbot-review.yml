@@ -163,10 +163,16 @@ jobs:
     needs: [command]
     # always(): command is skipped on pull_request/dispatch events and must not
     # auto-skip this job; the conditions below re-gate every event.
+    # Dependabot PRs are excluded from AUTO review only — a lockfile bump is not
+    # worth a review pass. /jbot on one still works.
     if: >-
       always() && (
         github.event_name == 'workflow_dispatch' ||
-        (github.event_name == 'pull_request' && github.event.pull_request.draft == false) ||
+        (
+          github.event_name == 'pull_request' &&
+          github.event.pull_request.draft == false &&
+          github.event.pull_request.user.login != 'dependabot[bot]'
+        ) ||
         (github.event_name == 'issue_comment' && needs.command.outputs.proceed == 'true')
       )
     # One review per PR (auto + one-off share the group; markers and threads
