@@ -38,7 +38,7 @@ rest is that provider's own model id.
 | <img src="docs/assets/logos/google.svg" width="15" style="vertical-align: -0.125em;" alt=""> Gemini | `model: google/…` | Fully supported |
 | <img src="docs/assets/logos/zai-coding-plan.svg" width="15" style="vertical-align: -0.125em;" alt=""> GLM | `model: zai-coding-plan/glm-…` or `opencode-go/glm-…` | Fully supported |
 | <img src="docs/assets/logos/xai.svg" width="15" style="vertical-align: -0.125em;" alt=""> Grok Build | `model: grok/…` | Fully supported |
-| <img src="docs/assets/logos/dim.png" width="15" style="vertical-align: -0.125em;" alt=""> DimAgent | `model: dim/…` (OAuth plan; bundle credential) | Fully supported |
+| <img src="docs/assets/logos/dim.svg" width="15" style="vertical-align: -0.125em;" alt=""> DimAgent | `model: dim/…` (OAuth plan; bundle credential) | Fully supported |
 | <img src="docs/assets/logos/kilo.svg" width="15" style="vertical-align: -0.125em;" alt=""> Kilo | `model: kilo/…` (free gateway default) | Fully supported |
 | <img src="docs/assets/logos/kimi.svg" width="15" style="vertical-align: -0.125em;" alt=""> Kimi | `model: kimi-for-coding/…` (Coding Plan API key) or `opencode-go/kimi-…` | Fully supported |
 | <img src="docs/assets/logos/minimax.svg" width="15" style="vertical-align: -0.125em;" alt=""> MiniMax | `model: opencode/minimax-…` or `opencode-go/minimax-…` | Fully supported |
