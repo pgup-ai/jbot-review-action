@@ -38,6 +38,7 @@ rest is that provider's own model id.
 | <img src="docs/assets/logos/google.svg" width="15" style="vertical-align: -0.125em;" alt=""> Gemini | `model: google/…` | Fully supported |
 | <img src="docs/assets/logos/zai-coding-plan.svg" width="15" style="vertical-align: -0.125em;" alt=""> GLM | `model: zai-coding-plan/glm-…` or `opencode-go/glm-…` | Fully supported |
 | <img src="docs/assets/logos/xai.svg" width="15" style="vertical-align: -0.125em;" alt=""> Grok Build | `model: grok/…` | Fully supported |
+| <img src="docs/assets/logos/dim.svg" width="15" style="vertical-align: -0.125em;" alt=""> DimAgent | `model: dim/…` (OAuth plan; bundle credential) | Fully supported |
 | <img src="docs/assets/logos/kilo.svg" width="15" style="vertical-align: -0.125em;" alt=""> Kilo | `model: kilo/…` (free gateway default) | Fully supported |
 | <img src="docs/assets/logos/kimi.svg" width="15" style="vertical-align: -0.125em;" alt=""> Kimi | `model: kimi-for-coding/…` (Coding Plan API key) or `opencode-go/kimi-…` | Fully supported |
 | <img src="docs/assets/logos/minimax.svg" width="15" style="vertical-align: -0.125em;" alt=""> MiniMax | `model: opencode/minimax-…` or `opencode-go/minimax-…` | Fully supported |
@@ -111,6 +112,7 @@ jobs:
           cursor-api-key: ${{ secrets.CURSOR_API_KEY }}
           poolside-api-key: ${{ secrets.POOLSIDE_API_KEY }}
           qoder-token: ${{ secrets.QODER_PERSONAL_ACCESS_TOKEN }}
+          dim-auth: ${{ secrets.DIM_AUTH_BUNDLE }}
           enable-context7: auto
           context7-api-key: ${{ secrets.CONTEXT7_API_KEY }}
           # Recall/precision controls (defaults shown): one general pass,
@@ -179,7 +181,7 @@ final sign-off with a stronger model than the auto-review default:
 
 | Input                        | Required | Default               | Description                                                                                                                                                                                                                                                                                                                                                           |
 | ---------------------------- | -------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `provider`                   | No       | from `model`          | Deprecated — qualify `model` instead; pins both models when set (`JBOT_REVIEW_PROVIDER`). Valid ids: opencode, opencode-go, deepseek, openai, openai-compatible, anthropic, google, openrouter, nvidia, zai-coding-plan, kimi-for-coding, xai, xiaomi-token-plan-sgp, fireworks-ai, poolside, devin, commandcode, cursor, qoder, codex, cline, cline-pass, grok, kilo |
+| `provider`                   | No       | from `model`          | Deprecated — qualify `model` instead; pins both models when set (`JBOT_REVIEW_PROVIDER`). Valid ids: opencode, opencode-go, deepseek, openai, openai-compatible, anthropic, google, openrouter, nvidia, zai-coding-plan, kimi-for-coding, xai, xiaomi-token-plan-sgp, fireworks-ai, poolside, devin, commandcode, cursor, qoder, dim, codex, cline, cline-pass, grok, kilo |
 | `model`                      | No       | `opencode` default    | `provider/model` reference, or a comma-separated pool that may span providers; required for `openai-compatible`                                                                                                                                                                                                                                                       |
 | `sdk-engine`                 | No       | `auto`                | `auto` uses pi for cataloged models; `opencode` pins SDK sessions to OpenCode                                                                                                                                                                                                                                                                                         |
 | `opencode-api-key`           | No       | —                     | Used when the main or aux model names `opencode`/`opencode-go`                                                                                                                                                                                                                                                                                                        |
@@ -205,6 +207,7 @@ final sign-off with a stronger model than the auto-review default:
 | `cline-auth`                 | No       | —                     | Cline CLI auth (contents of `~/.cline/data/settings/providers.json`); used when the main or aux model names `cline` / `cline-pass`                                                                                                                                                                                                                                    |
 | `grok-auth`                  | No       | —                     | Grok account auth (contents of `~/.grok/auth.json`); preferred over `xai-api-key` when `grok` is selected                                                                                                                                                                                                                                                             |
 | `kilo-auth`                  | No       | —                     | Kilo CLI auth (contents of `~/.local/share/kilo/auth.json`); used when the main or aux model names `kilo`                                                                                                                                                                                                                                                             |
+| `dim-auth`                   | No       | —                     | DimAgent CLI auth — the bundle printed by `npm run dim:bundle` in [pgup-ai/jbot-review](https://github.com/pgup-ai/jbot-review) (`auth.json` plus the pruned provider store); used when the main or aux model names `dim`                                                                                                                                                                                                                    |
 | `enable-context7`            | No       | `auto`                | Use Context7 MCP for external contract changes; `auto`, `true`, or `false`                                                                                                                                                                                                                                                                                            |
 | `context7-api-key`           | No       | —                     | Optional Context7 key for reliable CI docs lookup                                                                                                                                                                                                                                                                                                                     |
 | `github-token`               | Yes      | `${{ github.token }}` | Token for posting the review                                                                                                                                                                                                                                                                                                                                          |
@@ -344,6 +347,13 @@ If both credentials are supplied, account auth takes precedence over `xai-api-ke
 Use a `model` on `kilo` with `kilo-auth` / `KILO_AUTH_CONTENT` (the contents of
 `~/.local/share/kilo/auth.json`) for the Kilo CLI backend; it defaults to the free
 `kilo/kilo-auto/free` gateway model.
+Use a `model` on `dim` with `dim-auth` / `DIM_AUTH_BUNDLE` for the DimAgent CLI
+backend, e.g. `dim/dimcode-api-oauth/deepseek-v4-flash`. Its plan is OAuth-only,
+so the credential is not a key: authenticate once with
+`dim auth login --device-login --provider dimcode-api-oauth`, then run
+`npm run dim:bundle` in [pgup-ai/jbot-review](https://github.com/pgup-ai/jbot-review)
+and store its output. The bundle carries `auth.json` **and** the pruned provider
+store, because `auth.json` alone leaves dim reporting `No connected provider`.
 This convenience pattern exposes every configured provider key to the action
 runtime. For a least-privilege setup, pass only the selected provider's key and,
 when needed, the aux provider's key:
