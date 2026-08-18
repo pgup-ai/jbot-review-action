@@ -110,6 +110,10 @@ inputs:
     description: 'Kilo CLI auth: the contents of ~/.local/share/kilo/auth.json. Used when the main or aux model names kilo.'
     required: false
     default: ''
+  dim-auth:
+    description: 'DimAgent CLI auth: the bundle printed by `npm run dim:bundle` (auth.json plus the pruned provider store). Used when the main or aux model names dim.'
+    required: false
+    default: ''
   enable-context7:
     description: 'Enable Context7 MCP documentation lookup for external API/SDK/framework/workflow changes. Use auto, true, or false.'
     required: false
@@ -248,6 +252,7 @@ runs:
     INPUT_CLINE-AUTH: ${{ inputs.cline-auth }}
     INPUT_GROK-AUTH: ${{ inputs.grok-auth }}
     INPUT_KILO-AUTH: ${{ inputs.kilo-auth }}
+    INPUT_DIM-AUTH: ${{ inputs.dim-auth }}
     INPUT_ENABLE-CONTEXT7: ${{ inputs.enable-context7 }}
     INPUT_CONTEXT7-API-KEY: ${{ inputs.context7-api-key }}
     INPUT_GITHUB-TOKEN: ${{ inputs.github-token }}

@@ -285,6 +285,7 @@ jobs:
           cline-auth: ${{ secrets.CLINE_AUTH_JSON }}
           grok-auth: ${{ secrets.GROK_AUTH_JSON }}
           kilo-auth: ${{ secrets.KILO_AUTH_CONTENT }}
+          dim-auth: ${{ secrets.DIM_AUTH_BUNDLE }}
           context7-api-key: ${{ secrets.CONTEXT7_API_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           thread-resolution-token: ${{ secrets.JBOT_REVIEW_THREAD_RESOLUTION_TOKEN }}
