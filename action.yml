@@ -18,6 +18,10 @@ inputs:
     description: 'SDK routing: auto uses pi when its catalog has the selected model, otherwise opencode; opencode pins every SDK session to opencode.'
     required: false
     default: ''
+  opencode-proxy-url:
+    description: 'Optional HTTP/HTTPS proxy URL for OpenCode. A successful api.ipify.org check pins SDK sessions to OpenCode; failures continue without the proxy. Ignored for fork-head PRs.'
+    required: false
+    default: ''
   opencode-api-key:
     description: 'OpenCode API key. Used when the main or aux model names opencode/opencode-go.'
     required: false
@@ -229,6 +233,7 @@ runs:
     INPUT_PROVIDER: ${{ inputs.provider }}
     INPUT_MODEL: ${{ inputs.model }}
     INPUT_SDK-ENGINE: ${{ inputs.sdk-engine }}
+    JBOT_OPENCODE_HTTPS_PROXY: ${{ inputs.opencode-proxy-url }}
     INPUT_OPENCODE-API-KEY: ${{ inputs.opencode-api-key }}
     INPUT_DEEPSEEK-API-KEY: ${{ inputs.deepseek-api-key }}
     INPUT_OPENAI-API-KEY: ${{ inputs.openai-api-key }}

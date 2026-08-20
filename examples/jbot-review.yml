@@ -242,6 +242,7 @@ jobs:
           provider: ${{ needs.command.outputs.provider || inputs.provider || vars.JBOT_REVIEW_PROVIDER || '' }}
           model: ${{ needs.command.outputs.model || inputs.model || vars.JBOT_REVIEW_MODEL || '' }}
           sdk-engine: ${{ vars.JBOT_SDK_ENGINE || '' }}
+          opencode-proxy-url: ${{ secrets.OPENCODE_PROXY_URL }}
           pr-number: ${{ github.event.pull_request.number || inputs['pr-number'] || github.event.issue.number }}
           dry-run: ${{ inputs['dry-run'] || 'false' }}
           auto-approve: ${{ needs.command.outputs.auto_approve || vars.JBOT_AUTO_APPROVE || 'false' }}
