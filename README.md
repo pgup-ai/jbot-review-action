@@ -261,8 +261,8 @@ The chosen model is logged and appears in the posted review's metadata block.
 
 **Candidates may name different providers.** Each provider's key is resolved
 separately, so a pool can mix them — every provider a pool draws on needs its
-own key, and a candidate that cannot run is a
-configuration error rather than silently skipped.
+own key, and a candidate that cannot run is a configuration error rather than
+silently skipped.
 
 Auxiliary sessions draw from that same pool. Their seed is salted, so the two
 picks are independent rather than locked to the same index — not that they
@@ -348,8 +348,8 @@ so the credential is not a key: authenticate once with
 and store its output. The bundle carries `auth.json` **and** the pruned provider
 store, because `auth.json` alone leaves dim reporting `No connected provider`.
 This convenience pattern exposes every configured provider key to the action
-runtime. For a least-privilege setup, pass only the key for each provider the pool can
-draw on:
+runtime. For a least-privilege setup, pass only the key for each provider the
+pool can draw on:
 
 ```yaml
 with:
