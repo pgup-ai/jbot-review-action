@@ -249,8 +249,6 @@ jobs:
           max-findings: ${{ inputs['max-findings'] || '0' }}
           min-severity: ${{ inputs['min-severity'] || 'nit' }}
           include-prior-comments: ${{ inputs['include-prior-comments'] || 'true' }}
-          aux-provider: ${{ vars.JBOT_AUX_PROVIDER || '' }}
-          aux-model: ${{ vars.JBOT_REVIEW_AUX_MODEL || '' }}
           review-passes: ${{ vars.JBOT_REVIEW_PASSES || '1' }}
           verify-findings: ${{ vars.JBOT_VERIFY_FINDINGS || 'true' }}
           time-budget-minutes: ${{ vars.JBOT_TIME_BUDGET_MINUTES || '30' }}
