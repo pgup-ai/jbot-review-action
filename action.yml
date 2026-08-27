@@ -7,11 +7,11 @@ branding:
 
 inputs:
   provider:
-    description: 'Deprecated — name the provider in model instead. When set it pins the provider for model and aux-model, keeping the previous resolution exactly. Defaults to opencode when neither names one.'
+    description: 'Deprecated — name the provider in model instead. When set it pins the provider for model, keeping the previous resolution exactly. Defaults to opencode when neither names one.'
     required: false
     default: ''
   model:
-    description: "Model as provider/model, e.g. opencode/deepseek-v4-flash-free. Only the first segment selects the provider; the rest is that provider's own model id and may itself contain slashes (kilo/zai/glm-5.2). A comma-separated list is a pool; each run picks one by PR head sha. Candidates may name different providers, and every provider they draw on needs its own key. Uses the provider default if unset; required for openai-compatible."
+    description: "Model as provider/model, e.g. opencode/deepseek-v4-flash-free. Only the first segment selects the provider; the rest is that provider's own model id and may itself contain slashes (kilo/zai/glm-5.2). A comma-separated list is a pool; the first attempt picks by PR head sha and rerun attempts advance through it. Candidates may name different providers, and every provider they draw on needs its own key. Auxiliary sessions (recall lens passes, addressed-thread check, guideline compliance, finding verification) draw from this same pool on a salted seed, so their pick is independent of the main one rather than locked to it; both hash into the same pool, so roughly 1/n of runs give both roles the same candidate. Uses the provider default if unset; required for openai-compatible."
     required: false
     default: ''
   sdk-engine:
@@ -162,14 +162,6 @@ inputs:
     description: 'Run a dedicated guideline-compliance review session when repository guidelines are discovered.'
     required: false
     default: 'true'
-  aux-model:
-    description: 'Model for auxiliary sessions (recall lens passes, addressed-thread check, guideline compliance, finding verification), as provider/model, or a comma-separated pool picked per PR head sha; pool candidates may name different providers. An id that names no provider belongs to aux-provider when set, else to the deprecated provider pin when that is set, else to the main model this run picked. Uses the main model when unset.'
-    required: false
-    default: ''
-  aux-provider:
-    description: 'Deprecated — name the provider in aux-model instead. When set it pins the provider for aux-model, keeping the previous resolution exactly.'
-    required: false
-    default: ''
   review-passes:
     description: 'Total review passes (1-3). Passes beyond the first add focused recall lenses (interactions, then integrity) in parallel on the aux model; findings are merged and deduped. Each extra pass costs roughly one extra model session — cheap on paid tiers, but adds queue time on throttled free tiers. Default 1; raise to 2-3 for maximum recall.'
     required: false
@@ -191,7 +183,7 @@ inputs:
     required: false
     default: 'true'
   model-options:
-    description: 'JSON object of provider options for the main model. Native providers default to {"reasoningEffort":"medium"}; Poolside uses {"reasoningEffort":"default"} to leave reasoning provider-managed; custom providers default to {} because arbitrary endpoints may reject unknown options. Governs the main model only. An auxiliary session running a model of its own gets the same treatment one tier lower, since it sits on the tail of the run: {"reasoningEffort":"low"} on native providers, {"reasoningEffort":"default"} on Poolside, {} on custom ones. An aux-model that is the main model shares its entry and its effort, as does an aux model sharing a pi runtime with the main one — pi carries one thinking level per runtime.'
+    description: 'JSON object of provider options for the main model. Native providers default to {"reasoningEffort":"medium"}; Poolside uses {"reasoningEffort":"default"} to leave reasoning provider-managed; custom providers default to {} because arbitrary endpoints may reject unknown options. Governs the main model only. An auxiliary session running a model of its own gets the same treatment one tier lower, since it sits on the tail of the run: {"reasoningEffort":"low"} on native providers, {"reasoningEffort":"default"} on Poolside, {} on custom ones. An auxiliary session drawing the main model shares its entry and its effort — on every engine: pi levels are per session, so a distinct aux model on a shared pi runtime takes the aux effort. CommandCode sessions map reasoningEffort onto the CLI --effort flag from a per-model allowlist in code: an explicitly-set effort clamps to the nearest declared tier, default options deliver only on an exact match, and undeclared models always keep the CLI default. Other CLI backends do not consume model options — on Devin, effort is part of the model id itself.'
     required: false
   prompt-cache:
     description: 'Enable opencode prompt caching (provider setCacheKey). Parallel shards and re-reviews share an identical prompt prefix, so caching cuts input-token cost on models that honor it; models marked unsupported omit the cache key. Per-session cache hits are logged.'
@@ -269,8 +261,6 @@ runs:
     INPUT_MIN-SEVERITY: ${{ inputs.min-severity }}
     INPUT_INCLUDE-PRIOR-COMMENTS: ${{ inputs.include-prior-comments }}
     INPUT_ENABLE-GUIDELINE-PASS: ${{ inputs.enable-guideline-pass }}
-    INPUT_AUX-MODEL: ${{ inputs.aux-model }}
-    INPUT_AUX-PROVIDER: ${{ inputs.aux-provider }}
     INPUT_REVIEW-PASSES: ${{ inputs.review-passes }}
     INPUT_VERIFY-FINDINGS: ${{ inputs.verify-findings }}
     INPUT_TIME-BUDGET-MINUTES: ${{ inputs.time-budget-minutes }}

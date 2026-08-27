@@ -118,13 +118,8 @@ jobs:
           context7-api-key: ${{ secrets.CONTEXT7_API_KEY }}
           # Recall/precision controls (defaults shown): one general pass,
           # blocking findings adversarially verified before posting.
-          # A qualified aux-model (e.g. deepseek/deepseek-v4-flash) runs the
-          # auxiliary sessions on the provider it names — useful when the main
-          # model is a stronger tier and these checks can stay cheap and fast.
           review-passes: '1'
           verify-findings: 'true'
-          aux-provider: ${{ vars.JBOT_AUX_PROVIDER || '' }}
-          aux-model: ${{ vars.JBOT_REVIEW_AUX_MODEL || '' }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           thread-resolution-token: ${{ secrets.JBOT_REVIEW_THREAD_RESOLUTION_TOKEN }}
 ```
@@ -182,8 +177,8 @@ final sign-off with a stronger model than the auto-review default:
 
 | Input                        | Required | Default               | Description                                                                                                                                                                                                                                                                                                                                                           |
 | ---------------------------- | -------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `provider`                   | No       | from `model`          | Deprecated — qualify `model` instead; pins both models when set (`JBOT_REVIEW_PROVIDER`). Valid ids: opencode, opencode-go, deepseek, openai, openai-compatible, anthropic, google, openrouter, nvidia, zai-coding-plan, kimi-for-coding, xai, xiaomi-token-plan-sgp, fireworks-ai, poolside, devin, commandcode, cursor, qoder, dim, codex, cline, cline-pass, grok, kilo |
-| `model`                      | No       | `opencode` default    | `provider/model` reference, or a comma-separated pool that may span providers; required for `openai-compatible`                                                                                                                                                                                                                                                       |
+| `provider`                   | No       | from `model`          | Deprecated — qualify `model` instead; pins the provider for `model` when set (`JBOT_REVIEW_PROVIDER`). Valid ids: opencode, opencode-go, deepseek, openai, openai-compatible, anthropic, google, openrouter, nvidia, zai-coding-plan, kimi-for-coding, xai, xiaomi-token-plan-sgp, fireworks-ai, poolside, devin, commandcode, cursor, qoder, dim, codex, cline, cline-pass, grok, kilo |
+| `model`                      | No       | `opencode` default    | `provider/model` reference, or a comma-separated pool that may span providers; auxiliary sessions draw from it too, on a salted seed; required for `openai-compatible`                                                                                                                                                                                                                                                       |
 | `sdk-engine`                 | No       | `auto`                | `auto` uses pi for cataloged models; `opencode` pins SDK sessions to OpenCode                                                                                                                                                                                                                                                                                         |
 | `opencode-proxy-url`         | No       | —                     | Optional HTTP/HTTPS proxy URL for OpenCode; successful verification pins SDK sessions to OpenCode; ignored for fork-head PRs and skipped without failing the review when unavailable                                                                                                                                                                                  |
 | `opencode-api-key`           | No       | —                     | Used when the main or aux model names `opencode`/`opencode-go`                                                                                                                                                                                                                                                                                                        |
@@ -221,8 +216,6 @@ final sign-off with a stronger model than the auto-review default:
 | `min-severity`               | No       | `nit`                 | Minimum severity to include: `P0`, `P1`, `P2`, `P3`, or `nit`                                                                                                                                                                                                                                                                                                         |
 | `include-prior-comments`     | No       | `true`                | Include prior PR review comments in context                                                                                                                                                                                                                                                                                                                           |
 | `enable-guideline-pass`      | No       | `true`                | Run a dedicated guideline-compliance pass when repository guidelines are discovered                                                                                                                                                                                                                                                                                   |
-| `aux-model`                  | No       | —                     | Auxiliary-session model as `provider/model`, or a pool like `model` that may span providers; a bare id follows `aux-provider`, else the deprecated `provider` pin, else the picked main model; uses the main model when unset                                                                                                                                         |
-| `aux-provider`               | No       | from `aux-model`      | Deprecated — qualify `aux-model` instead; pins only the aux provider when set (`JBOT_AUX_PROVIDER`)                                                                                                                                                                                                                                                                   |
 | `review-passes`              | No       | `1`                   | Total review passes, 1-3. Raise to 2-3 for extra recall lenses                                                                                                                                                                                                                                                                                                        |
 | `verify-findings`            | No       | `true`                | Re-check blocking findings before posting; uncertain findings become advisory                                                                                                                                                                                                                                                                                         |
 | `time-budget-minutes`        | No       | `30`                  | Wall-clock target in minutes; `0` disables budget-derived session timeouts                                                                                                                                                                                                                                                                                            |
@@ -249,38 +242,37 @@ requirements still apply.
 
 See the generated [J-Bot model ID catalog](https://github.com/pgup-ai/jbot-review/blob/main/MODEL_CATALOG.md)
 for current Models.dev and CLI-backed model IDs.
-Use repository or organization Actions variables `JBOT_REVIEW_MODEL`,
-`JBOT_REVIEW_AUX_MODEL`, and `JBOT_SDK_ENGINE` to change future review runs
-without editing workflow YAML. (`JBOT_REVIEW_PROVIDER` / `JBOT_AUX_PROVIDER`
-still work, but a qualified model makes them unnecessary.)
-The action uses the key matching the main model's provider, plus the aux
-provider's key when `aux-model` names a different one. The example can pass
-multiple provider secrets and leave unused ones empty. Models come from either
-action inputs or environment variables: `model` or `JBOT_REVIEW_MODEL` for the
-main model, and `aux-model` or `JBOT_REVIEW_AUX_MODEL` for the auxiliary one.
+Use repository or organization Actions variables `JBOT_REVIEW_MODEL` and
+`JBOT_SDK_ENGINE` to change future review runs without editing workflow YAML.
+(`JBOT_REVIEW_PROVIDER` still works, but a qualified model makes it
+unnecessary.)
+The action uses the key matching each pool candidate's provider, since the main
+pass and the auxiliary sessions both draw from that one pool. The example can
+pass multiple provider secrets and leave unused ones empty. The pool comes from
+either the `model` input or `JBOT_REVIEW_MODEL`.
 
-A comma-separated `model` is a pool: each run reviews with one candidate,
-chosen by hashing the PR head sha. Load spreads across the pool as PRs and
-pushes come in, while re-reviewing the same commit always picks the same model,
-so a rerun reproduces. Every candidate is validated before the review starts.
+A comma-separated `model` is a pool: a run's first attempt chooses one
+candidate by hashing the PR head sha, and each rerun attempt advances to the
+next, wrapping at the end. Load spreads across the pool as PRs and pushes come
+in; a new run for the same head starts from the same candidate, so the initial
+choice reproduces while a rerun can bypass a failing model. Every candidate is
+validated before the review starts.
 The chosen model is logged and appears in the posted review's metadata block.
 
-**Candidates may name different providers.** Only one runs per PR, and each
-provider's key is resolved separately, so a pool can mix them — every provider
-a pool draws on needs its own key, and a candidate that cannot run is a
-configuration error rather than silently skipped.
+**Candidates may name different providers.** Each provider's key is resolved
+separately, so a pool can mix them — every provider a pool draws on needs its
+own key, and a candidate that cannot run is a configuration error rather than
+silently skipped.
 
-`aux-model` takes a pool on the same terms. Its pick is salted, so setting both
-inputs to the same list still varies the pair instead of always drawing the
-same two entries.
+Auxiliary sessions draw from that same pool. Their seed is salted, so the two
+picks are independent rather than locked to the same index — not that they
+differ: both hash into the same pool, so roughly 1/n of runs land both roles on
+one candidate, and a one-entry pool always does.
 
 ```yaml
 model: opencode/deepseek-v4-flash-free,opencode/glm-5-free,opencode/kimi-k2.5-free
 ```
 
-Auxiliary sessions use `aux-model` or `JBOT_REVIEW_AUX_MODEL` when set,
-otherwise the main model. An aux model naming no provider stays on the main
-provider.
 Provider API keys can also be supplied through their standard env vars, such as
 `GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `NVIDIA_API_KEY`, `ZAI_API_KEY`,
 `KIMI_API_KEY`, `POOLSIDE_API_KEY`, `JBOT_OPENAI_COMPATIBLE_API_KEY`,
@@ -311,9 +303,8 @@ with:
 These settings never fall back to `OPENAI_API_KEY` or `OPENAI_BASE_URL`, so the
 direct `openai` provider remains isolated. J-Bot omits `setCacheKey` for both
 providers; generic endpoints may reject that extra request field, and Kimi's
-catalog does not advertise support for it. When `openai-compatible` is the
-auxiliary provider, pass its namespaced key and base URL alongside
-`aux-provider` and `aux-model`.
+catalog does not advertise support for it. When `openai-compatible` is among the
+pool's providers, pass its namespaced key and base URL.
 
 Use a `model` on `devin` with `devin-windsurf-api-key` /
 `DEVIN_WINDSURF_API_KEY` for the Devin CLI backend — the secret is the
@@ -357,8 +348,8 @@ so the credential is not a key: authenticate once with
 and store its output. The bundle carries `auth.json` **and** the pruned provider
 store, because `auth.json` alone leaves dim reporting `No connected provider`.
 This convenience pattern exposes every configured provider key to the action
-runtime. For a least-privilege setup, pass only the selected provider's key and,
-when needed, the aux provider's key:
+runtime. For a least-privilege setup, pass only the key for each provider the
+pool can draw on:
 
 ```yaml
 with:
@@ -381,14 +372,13 @@ integration` in the logs, add a secret such as
 `JBOT_REVIEW_THREAD_RESOLUTION_TOKEN` with a PAT or GitHub App token that can
 resolve PR review threads, then pass it through `thread-resolution-token`.
 
-When `aux-model` names a different provider than the main model, that
-provider's own key input or env var is required — a key is never reused across
-providers.
+Every provider the pool draws on needs its own key input or env var — a key is
+never reused across providers.
 CLI backends cannot reuse opencode-provider keys, and opencode-backed providers
 cannot reuse CLI credentials such as `DEVIN_WINDSURF_API_KEY`,
 `COMMANDCODE_ACCESS_KEY`, `CURSOR_API_KEY`, `QODER_PERSONAL_ACCESS_TOKEN`, or
 `GROK_AUTH_JSON`, so mixed CLI/opencode-backed
-main+aux configurations must pass both keys.
+pools must pass both keys.
 
 A model is written `provider/model`, and only the **first** slash splits it: the
 first segment picks the provider, and everything after it is that provider's own
@@ -397,12 +387,15 @@ model id, which may contain further slashes. So `kilo/zai/glm-5.2` and
 and `nvidia/moonshotai/kimi-k2.6` keeps its publisher prefix intact. A model id
 with no provider segment falls back to `opencode`.
 
-The legacy `provider` / `aux-provider` inputs still work and keep the previous
-resolution exactly. Setting either one pins the provider: an unprefixed id
-belongs to it, a matching `provider/` prefix is stripped, and any other slash
-prefix stays part of the model id. `provider` pins both models; `aux-provider`
-pins only `aux-model`. New setups should qualify both models and drop both
-inputs.
+The legacy `provider` input still works and keeps the previous resolution
+exactly. Setting it pins the provider: an unprefixed id belongs to it, a
+matching `provider/` prefix is stripped, and any other slash prefix stays part
+of the model id. New setups should qualify every candidate and drop the input.
+
+`aux-model` and `aux-provider` were removed; both roles now draw from `model`.
+A workflow still passing either input keeps working — the action no longer
+declares them, so GitHub reports them as unexpected and the review ignores
+them.
 
 Migrating from `api-key`: replace the old unified `api-key` input with the
 matching provider-specific input, such as `opencode-api-key` for a model on
