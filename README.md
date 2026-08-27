@@ -177,7 +177,7 @@ final sign-off with a stronger model than the auto-review default:
 
 | Input                        | Required | Default               | Description                                                                                                                                                                                                                                                                                                                                                           |
 | ---------------------------- | -------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `provider`                   | No       | from `model`          | Deprecated — qualify `model` instead; pins both models when set (`JBOT_REVIEW_PROVIDER`). Valid ids: opencode, opencode-go, deepseek, openai, openai-compatible, anthropic, google, openrouter, nvidia, zai-coding-plan, kimi-for-coding, xai, xiaomi-token-plan-sgp, fireworks-ai, poolside, devin, commandcode, cursor, qoder, dim, codex, cline, cline-pass, grok, kilo |
+| `provider`                   | No       | from `model`          | Deprecated — qualify `model` instead; pins the provider for `model` when set (`JBOT_REVIEW_PROVIDER`). Valid ids: opencode, opencode-go, deepseek, openai, openai-compatible, anthropic, google, openrouter, nvidia, zai-coding-plan, kimi-for-coding, xai, xiaomi-token-plan-sgp, fireworks-ai, poolside, devin, commandcode, cursor, qoder, dim, codex, cline, cline-pass, grok, kilo |
 | `model`                      | No       | `opencode` default    | `provider/model` reference, or a comma-separated pool that may span providers; auxiliary sessions draw from it too, on a salted seed; required for `openai-compatible`                                                                                                                                                                                                                                                       |
 | `sdk-engine`                 | No       | `auto`                | `auto` uses pi for cataloged models; `opencode` pins SDK sessions to OpenCode                                                                                                                                                                                                                                                                                         |
 | `opencode-proxy-url`         | No       | —                     | Optional HTTP/HTTPS proxy URL for OpenCode; successful verification pins SDK sessions to OpenCode; ignored for fork-head PRs and skipped without failing the review when unavailable                                                                                                                                                                                  |
@@ -251,15 +251,17 @@ pass and the auxiliary sessions both draw from that one pool. The example can
 pass multiple provider secrets and leave unused ones empty. The pool comes from
 either the `model` input or `JBOT_REVIEW_MODEL`.
 
-A comma-separated `model` is a pool: each run reviews with one candidate,
-chosen by hashing the PR head sha. Load spreads across the pool as PRs and
-pushes come in, while re-reviewing the same commit always picks the same model,
-so a rerun reproduces. Every candidate is validated before the review starts.
+A comma-separated `model` is a pool: a run's first attempt chooses one
+candidate by hashing the PR head sha, and each rerun attempt advances to the
+next, wrapping at the end. Load spreads across the pool as PRs and pushes come
+in; a new run for the same head starts from the same candidate, so the initial
+choice reproduces while a rerun can bypass a failing model. Every candidate is
+validated before the review starts.
 The chosen model is logged and appears in the posted review's metadata block.
 
-**Candidates may name different providers.** Only one runs per PR, and each
-provider's key is resolved separately, so a pool can mix them — every provider
-a pool draws on needs its own key, and a candidate that cannot run is a
+**Candidates may name different providers.** Each provider's key is resolved
+separately, so a pool can mix them — every provider a pool draws on needs its
+own key, and a candidate that cannot run is a
 configuration error rather than silently skipped.
 
 Auxiliary sessions draw from that same pool. Their seed is salted, so the two
@@ -346,8 +348,8 @@ so the credential is not a key: authenticate once with
 and store its output. The bundle carries `auth.json` **and** the pruned provider
 store, because `auth.json` alone leaves dim reporting `No connected provider`.
 This convenience pattern exposes every configured provider key to the action
-runtime. For a least-privilege setup, pass only the selected provider's key and,
-when needed, the aux provider's key:
+runtime. For a least-privilege setup, pass only the key for each provider the pool can
+draw on:
 
 ```yaml
 with:
