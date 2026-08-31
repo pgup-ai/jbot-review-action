@@ -52,7 +52,7 @@ rest is that provider's own model id.
 | <img src="docs/assets/logos/poolside.png" width="15" style="vertical-align: -0.125em;" alt=""> Poolside | `model: poolside/…` | Fully supported |
 | <img src="docs/assets/logos/qoder.svg" width="15" style="vertical-align: -0.125em;" alt=""> Qoder | `model: qoder/…` | Fully supported |
 | <img src="docs/assets/logos/qwen.svg" width="15" style="vertical-align: -0.125em;" alt=""> Qwen | `model: opencode-go/qwen…` | Fully supported |
-| TokenRouter | `model: tokenrouter/…` (free GLM tier) | Fully supported |
+| <img src="docs/assets/logos/tokenrouter.svg" width="15" style="vertical-align: -0.125em;" alt=""> TokenRouter | `model: tokenrouter/…` (free GLM tier) | Fully supported |
 | <img src="docs/assets/logos/vercel.svg" width="15" style="vertical-align: -0.125em;" alt=""> Vercel | `model: opencode/vercel/…` | Fully supported |
 | <img src="docs/assets/logos/xai.svg" width="15" style="vertical-align: -0.125em;" alt=""> xAI | `model: xai/…` | Fully supported |
 
