@@ -52,6 +52,7 @@ rest is that provider's own model id.
 | <img src="docs/assets/logos/poolside.png" width="15" style="vertical-align: -0.125em;" alt=""> Poolside | `model: poolside/…` | Fully supported |
 | <img src="docs/assets/logos/qoder.svg" width="15" style="vertical-align: -0.125em;" alt=""> Qoder | `model: qoder/…` | Fully supported |
 | <img src="docs/assets/logos/qwen.svg" width="15" style="vertical-align: -0.125em;" alt=""> Qwen | `model: opencode-go/qwen…` | Fully supported |
+| TokenRouter | `model: tokenrouter/…` (free GLM tier) | Fully supported |
 | <img src="docs/assets/logos/vercel.svg" width="15" style="vertical-align: -0.125em;" alt=""> Vercel | `model: opencode/vercel/…` | Fully supported |
 | <img src="docs/assets/logos/xai.svg" width="15" style="vertical-align: -0.125em;" alt=""> xAI | `model: xai/…` | Fully supported |
 
@@ -108,6 +109,7 @@ jobs:
           grok-auth: ${{ secrets.GROK_AUTH_JSON }}
           fireworks-api-key: ${{ secrets.FIREWORKS_API_KEY }}
           mimo-api-key: ${{ secrets.MIMO_API_KEY }}
+          tokenrouter-api-key: ${{ secrets.TOKENROUTER_API_KEY }}
           devin-windsurf-api-key: ${{ secrets.DEVIN_WINDSURF_API_KEY }}
           commandcode-access-key: ${{ secrets.COMMANDCODE_ACCESS_KEY }}
           cursor-api-key: ${{ secrets.CURSOR_API_KEY }}
@@ -195,6 +197,7 @@ final sign-off with a stronger model than the auto-review default:
 | `xai-api-key`                | No       | —                     | Used by `xai`, or by `grok` when `grok-auth` is empty                                                                                                                                                                                                                                                                                                                 |
 | `fireworks-api-key`          | No       | —                     | Used when the main or aux model names `fireworks-ai`                                                                                                                                                                                                                                                                                                                  |
 | `mimo-api-key`               | No       | —                     | Used when the main or aux model names `xiaomi-token-plan-sgp`                                                                                                                                                                                                                                                                                                         |
+| `tokenrouter-api-key`        | No       | —                     | Used when the main or aux model names `tokenrouter`                                                                                                                                                                                                                                                                                                                   |
 | `devin-windsurf-api-key`     | No       | —                     | Used when the main or aux model names `devin`                                                                                                                                                                                                                                                                                                                         |
 | `commandcode-access-key`     | No       | —                     | Used when the main or aux model names `commandcode`                                                                                                                                                                                                                                                                                                                   |
 | `cursor-api-key`             | No       | —                     | Used when the main or aux model names `cursor`                                                                                                                                                                                                                                                                                                                        |
