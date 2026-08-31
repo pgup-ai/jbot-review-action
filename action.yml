@@ -78,6 +78,10 @@ inputs:
     description: 'Xiaomi MiMo Token Plan API key (tp-… / sk-…). Used when the main or aux model names xiaomi-token-plan-sgp.'
     required: false
     default: ''
+  tokenrouter-api-key:
+    description: 'TokenRouter API key (sk-…). Used when the main or aux model names tokenrouter.'
+    required: false
+    default: ''
   devin-windsurf-api-key:
     description: 'Devin/Windsurf API key. Used when the main or aux model names devin.'
     required: false
@@ -240,6 +244,7 @@ runs:
     INPUT_XAI-API-KEY: ${{ inputs.xai-api-key }}
     INPUT_FIREWORKS-API-KEY: ${{ inputs.fireworks-api-key }}
     INPUT_MIMO-API-KEY: ${{ inputs.mimo-api-key }}
+    INPUT_TOKENROUTER-API-KEY: ${{ inputs.tokenrouter-api-key }}
     INPUT_DEVIN-WINDSURF-API-KEY: ${{ inputs.devin-windsurf-api-key }}
     INPUT_COMMANDCODE-ACCESS-KEY: ${{ inputs.commandcode-access-key }}
     INPUT_CURSOR-API-KEY: ${{ inputs.cursor-api-key }}
