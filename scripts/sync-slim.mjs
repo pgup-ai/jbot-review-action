@@ -3,7 +3,9 @@ import { readFileSync, writeFileSync } from 'node:fs';
 const root = new URL('../', import.meta.url);
 const source = readFileSync(new URL('action.yml', root), 'utf8');
 const image = "image: 'docker://ghcr.io/pgup-ai/jbot-review:latest'";
-if (!source.includes(image)) throw new Error('Root action no longer uses the expected full image.');
+if (source.split(image).length !== 2) {
+  throw new Error('Expected exactly one full-image reference in root action.yml.');
+}
 const generated = source.replace(image, "image: 'docker://ghcr.io/pgup-ai/jbot-review:latest-slim'");
 const target = new URL('slim/action.yml', root);
 if (process.argv.includes('--check')) {
