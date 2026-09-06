@@ -207,6 +207,7 @@ final sign-off with a stronger model than the auto-review default:
 | ---------------------------- | -------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `provider`                   | No       | from `model`          | Deprecated — qualify `model` instead; pins the provider for `model` when set (`JBOT_REVIEW_PROVIDER`). Valid ids: opencode, opencode-go, deepseek, openai, openai-compatible, anthropic, google, openrouter, nvidia, zai-coding-plan, kimi-for-coding, xai, xiaomi-token-plan-sgp, fireworks-ai, tokenrouter, poolside, devin, commandcode, cursor, qoder, dim, codex, cline, cline-pass, grok, kilo |
 | `model`                      | No       | `opencode` default    | `provider/model` reference, or a comma-separated pool that may span providers; auxiliary sessions draw from it too, on a salted seed; required for `openai-compatible`                                                                                                                                                                                                                                                       |
+| `aux-model-pool`             | No       | main `model` pool     | Optional separate provider/model pool for all auxiliary sessions. Blank keeps the existing shared pool.                                                                                                                                                                                                                                                                                                                      |
 | `sdk-engine`                 | No       | `auto`                | `auto` uses pi for cataloged models; `opencode` pins SDK sessions to OpenCode                                                                                                                                                                                                                                                                                         |
 | `opencode-proxy-url`         | No       | —                     | Optional HTTP/HTTPS proxy URL for OpenCode; successful verification pins SDK sessions to OpenCode; ignored for fork-head PRs and skipped without failing the review when unavailable                                                                                                                                                                                  |
 | `opencode-api-key`           | No       | —                     | Used when the main or aux model names `opencode`/`opencode-go`                                                                                                                                                                                                                                                                                                        |
@@ -422,7 +423,18 @@ exactly. Setting it pins the provider: an unprefixed id belongs to it, a
 matching `provider/` prefix is stripped, and any other slash prefix stays part
 of the model id. New setups should qualify every candidate and drop the input.
 
-`aux-model` and `aux-provider` were removed; both roles now draw from `model`.
+Set `aux-model-pool` to a comma-separated list of `provider/model` entries to
+choose auxiliary routes independently of the main pool. It controls lenses,
+guideline and addressed checks, summaries, and verification. Blank preserves
+the shared pool; the legacy `provider` input only pins the main pool. Both pools
+must have credentials and use runtimes supported by the selected image.
+
+```yaml
+model: opencode/your-main-model
+aux-model-pool: opencode/your-aux-model
+```
+
+`aux-model` and `aux-provider` were removed; both roles draw from `model` unless `aux-model-pool` is set.
 A workflow still passing either input keeps working — the action no longer
 declares them, so GitHub reports them as unexpected and the review ignores
 them.

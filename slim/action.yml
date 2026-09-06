@@ -11,7 +11,11 @@ inputs:
     required: false
     default: ''
   model:
-    description: "Model as provider/model, e.g. opencode/deepseek-v4-flash-free. Only the first segment selects the provider; the rest is that provider's own model id and may itself contain slashes (kilo/zai/glm-5.2). A comma-separated list is a pool; the first attempt picks by PR head sha and rerun attempts advance through it. Candidates may name different providers, and every provider they draw on needs its own key. Auxiliary sessions (recall lens passes, addressed-thread check, guideline compliance, finding verification) draw from this same pool on a salted seed, so their pick is independent of the main one rather than locked to it; both hash into the same pool, so roughly 1/n of runs give both roles the same candidate. Uses the provider default if unset; required for openai-compatible."
+    description: "Model as provider/model, e.g. opencode/deepseek-v4-flash-free. Only the first segment selects the provider; the rest is that provider's own model id and may itself contain slashes (kilo/zai/glm-5.2). A comma-separated list is a pool; the first attempt picks by PR head sha and rerun attempts advance through it. Candidates may name different providers, and every provider they draw on needs its own key. Auxiliary sessions (recall lens passes, addressed-thread check, guideline compliance, finding verification) use a salted seed and draw from the same pool by default; aux-model-pool can select a separate pool. Uses the provider default if unset; required for openai-compatible."
+    required: false
+    default: ''
+  aux-model-pool:
+    description: 'Optional comma-separated provider/model pool for auxiliary sessions, including lenses and verification. Defaults to the main model pool. Each provider requires its own credentials; the legacy provider input does not pin this pool.'
     required: false
     default: ''
   sdk-engine:
@@ -231,6 +235,7 @@ runs:
   args: ['/app/dist/workflow/index.js']
   env:
     INPUT_PROVIDER: ${{ inputs.provider }}
+    INPUT_AUX-MODEL-POOL: ${{ inputs.aux-model-pool }}
     INPUT_MODEL: ${{ inputs.model }}
     INPUT_SDK-ENGINE: ${{ inputs.sdk-engine }}
     JBOT_OPENCODE_HTTPS_PROXY: ${{ inputs.opencode-proxy-url }}
