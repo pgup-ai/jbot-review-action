@@ -1,0 +1,280 @@
+name: 'J-Bot Code Review'
+description: 'Open-source agentic PR review in your own CI — bring your model key or a CLI subscription (Codex, Cursor & more). $0/seat.'
+
+branding:
+  icon: 'git-pull-request'
+  color: 'green'
+
+inputs:
+  provider:
+    description: 'Deprecated — name the provider in model instead. When set it pins the provider for model, keeping the previous resolution exactly. Defaults to opencode when neither names one.'
+    required: false
+    default: ''
+  model:
+    description: "Model as provider/model, e.g. opencode/deepseek-v4-flash-free. Only the first segment selects the provider; the rest is that provider's own model id and may itself contain slashes (kilo/zai/glm-5.2). A comma-separated list is a pool; the first attempt picks by PR head sha and rerun attempts advance through it. Candidates may name different providers, and every provider they draw on needs its own key. Auxiliary sessions (recall lens passes, addressed-thread check, guideline compliance, finding verification) draw from this same pool on a salted seed, so their pick is independent of the main one rather than locked to it; both hash into the same pool, so roughly 1/n of runs give both roles the same candidate. Uses the provider default if unset; required for openai-compatible."
+    required: false
+    default: ''
+  sdk-engine:
+    description: 'SDK routing: auto uses pi when its catalog has the selected model, otherwise opencode; opencode pins every SDK session to opencode.'
+    required: false
+    default: ''
+  opencode-proxy-url:
+    description: 'Optional HTTP/HTTPS proxy URL for OpenCode. A successful api.ipify.org check pins SDK sessions to OpenCode; failures continue without the proxy. Ignored for fork-head PRs.'
+    required: false
+    default: ''
+  opencode-api-key:
+    description: 'OpenCode API key. Used when the main or aux model names opencode/opencode-go.'
+    required: false
+    default: ''
+  deepseek-api-key:
+    description: 'DeepSeek API key. Used when the main or aux model names deepseek.'
+    required: false
+    default: ''
+  openai-api-key:
+    description: 'OpenAI API key. Used when the main or aux model names openai.'
+    required: false
+    default: ''
+  openai-compatible-api-key:
+    description: 'API key for provider openai-compatible. Kept separate from the direct OpenAI key.'
+    required: false
+    default: ''
+  openai-compatible-base-url:
+    description: 'Base URL for provider openai-compatible, including any required API version path.'
+    required: false
+    default: ''
+  anthropic-api-key:
+    description: 'Anthropic API key. Used when the main or aux model names anthropic.'
+    required: false
+    default: ''
+  gemini-api-key:
+    description: 'Gemini API key. Used when the main or aux model names google.'
+    required: false
+    default: ''
+  openrouter-api-key:
+    description: 'OpenRouter API key. Used when the main or aux model names openrouter.'
+    required: false
+    default: ''
+  nvidia-api-key:
+    description: 'NVIDIA API key. Used when the main or aux model names nvidia.'
+    required: false
+    default: ''
+  zai-api-key:
+    description: 'Z.AI API key. Used when the main or aux model names zai-coding-plan.'
+    required: false
+    default: ''
+  kimi-api-key:
+    description: 'Kimi API key. Used when the main or aux model names kimi-for-coding.'
+    required: false
+    default: ''
+  xai-api-key:
+    description: 'xAI API key. Used by xai, or by grok when grok-auth is empty.'
+    required: false
+    default: ''
+  fireworks-api-key:
+    description: 'Fireworks AI API key. Used when the main or aux model names fireworks-ai.'
+    required: false
+    default: ''
+  mimo-api-key:
+    description: 'Xiaomi MiMo Token Plan API key (tp-… / sk-…). Used when the main or aux model names xiaomi-token-plan-sgp.'
+    required: false
+    default: ''
+  tokenrouter-api-key:
+    description: 'TokenRouter API key (sk-…). Used when the main or aux model names tokenrouter.'
+    required: false
+    default: ''
+  devin-windsurf-api-key:
+    description: 'Devin/Windsurf API key. Used when the main or aux model names devin.'
+    required: false
+    default: ''
+  commandcode-access-key:
+    description: 'CommandCode CLI access key. Used when the main or aux model names commandcode.'
+    required: false
+    default: ''
+  cursor-api-key:
+    description: 'Cursor API key. Used when the main or aux model names cursor.'
+    required: false
+    default: ''
+  poolside-api-key:
+    description: 'Poolside API key. Used when the main or aux model names poolside.'
+    required: false
+    default: ''
+  qoder-token:
+    description: 'Qoder personal access token. Used when the main or aux model names qoder.'
+    required: false
+    default: ''
+  codex-auth:
+    description: 'Codex CLI auth: the contents of ~/.codex/auth.json. Used when the main or aux model names codex.'
+    required: false
+    default: ''
+  cline-auth:
+    description: 'Cline CLI auth: the contents of ~/.cline/data/settings/providers.json. Used when the main or aux model names cline or cline-pass.'
+    required: false
+    default: ''
+  grok-auth:
+    description: 'Grok Build CLI account auth: the contents of ~/.grok/auth.json. Preferred over xai-api-key when grok is selected.'
+    required: false
+    default: ''
+  kilo-auth:
+    description: 'Kilo CLI auth: the contents of ~/.local/share/kilo/auth.json. Used when the main or aux model names kilo.'
+    required: false
+    default: ''
+  dim-auth:
+    description: 'DimAgent CLI auth: the bundle printed by `npm run dim:bundle` (auth.json plus the pruned provider store). Used when the main or aux model names dim.'
+    required: false
+    default: ''
+  enable-context7:
+    description: 'Enable Context7 MCP documentation lookup for external API/SDK/framework/workflow changes. Use auto, true, or false.'
+    required: false
+    default: 'auto'
+  context7-api-key:
+    description: 'Optional Context7 API key for reliable MCP documentation lookup in CI.'
+    required: false
+    default: ''
+  github-token:
+    description: 'Token to read the PR and post the review.'
+    required: true
+    default: ${{ github.token }}
+  thread-resolution-token:
+    description: 'Optional token used to resolve addressed review threads and minimize completed reviews. Falls back to github-token when unset.'
+    required: false
+    default: ''
+  pr-number:
+    description: 'Pull request number for manual workflow_dispatch runs.'
+    required: false
+    default: ''
+  dry-run:
+    description: 'Log the review body and inline comments without posting to GitHub.'
+    required: false
+    default: 'false'
+  auto-approve:
+    description: 'Approve an open, non-draft, mergeable PR when its exact reviewed head has no new or open jbot findings.'
+    required: false
+    default: 'false'
+  max-findings:
+    description: 'Maximum number of findings to post or log. Use 0 for no limit.'
+    required: false
+    default: '0'
+  min-severity:
+    description: 'Minimum severity to include: P0, P1, P2, P3, or nit.'
+    required: false
+    default: 'nit'
+  include-prior-comments:
+    description: 'Include prior PR review comments in the review context.'
+    required: false
+    default: 'true'
+  enable-guideline-pass:
+    description: 'Run a dedicated guideline-compliance review session when repository guidelines are discovered.'
+    required: false
+    default: 'true'
+  review-passes:
+    description: 'Total review passes (1-3). Passes beyond the first add focused recall lenses (interactions, then integrity) in parallel on the aux model; findings are merged and deduped. Each extra pass costs roughly one extra model session — cheap on paid tiers, but adds queue time on throttled free tiers. Default 1; raise to 2-3 for maximum recall.'
+    required: false
+    default: '1'
+  verify-findings:
+    description: 'Adversarially verify blocking findings in a dedicated session before posting: refuted findings are dropped, uncertain ones demoted to advisory.'
+    required: false
+    default: 'true'
+  time-budget-minutes:
+    description: 'Wall-clock target in minutes (0 = no budget). Derives per-session timeouts; an auxiliary session over its share fails open (degrades only itself), while a main review shard that still fails after its retry aborts the run rather than posting partial coverage.'
+    required: false
+    default: '30'
+  review-shards:
+    description: 'Parallel shards for the main review. 1 = no sharding, one full-diff session (default). 0 = auto from diff size, capped at 4. N = pin N shards. Sharding only speeds up review on providers that serve concurrent sessions; on free/throttled tiers the shards serialize on one API key, so 1 is the better default. Either way the review covers the complete diff. Raise it (and pair with max-concurrent-sessions) only on paid tiers with real concurrency, or for very large PRs where smaller per-shard context helps depth.'
+    required: false
+    default: '1'
+  dynamic-fanout:
+    description: 'Scale recall-supplement fan-out (extra lenses + the guideline pass) to diff risk/size; false forces the full requested fan-out on every PR.'
+    required: false
+    default: 'true'
+  model-options:
+    description: 'JSON object of provider options for the main model. Native providers default to {"reasoningEffort":"medium"}; Poolside uses {"reasoningEffort":"default"} to leave reasoning provider-managed; custom providers default to {} because arbitrary endpoints may reject unknown options. Governs the main model only. An auxiliary session running a model of its own gets the same treatment one tier lower, since it sits on the tail of the run: {"reasoningEffort":"low"} on native providers, {"reasoningEffort":"default"} on Poolside, {} on custom ones. An auxiliary session drawing the main model shares its entry and its effort — on every engine: pi levels are per session, so a distinct aux model on a shared pi runtime takes the aux effort. CommandCode sessions map reasoningEffort onto the CLI --effort flag from a per-model allowlist in code: an explicitly-set effort clamps to the nearest declared tier, default options deliver only on an exact match, and undeclared models always keep the CLI default. Other CLI backends do not consume model options — on Devin, effort is part of the model id itself.'
+    required: false
+  prompt-cache:
+    description: 'Enable opencode prompt caching (provider setCacheKey). Parallel shards and re-reviews share an identical prompt prefix, so caching cuts input-token cost on models that honor it; models marked unsupported omit the cache key. Per-session cache hits are logged.'
+    required: false
+    default: 'true'
+  skip-doc-only:
+    description: 'Skip the full LLM review when a PR changes only documentation, prose, or diagram assets (.md, .mdx, .markdown, .rst, .adoc, .txt, .pdf, .svg, .drawio, .dio, .excalidraw, .mmd, .puml, .plantuml). The reaction is left unchanged (a docs push does not change the verdict, so a prior clean reaction stays and an open-findings PR stays reaction-less); a single code/config file forces a full review. Deterministic, no model call.'
+    required: false
+    default: 'true'
+  max-concurrent-sessions:
+    description: 'Max model sessions in flight at once (default 3; 0 = unlimited). Throttled provider tiers serialize concurrent requests on one key upstream; capping on our side keeps session deadlines measuring model time, not queue time. Set 2 on tight free tiers, or 0 for unlimited on paid concurrent tiers.'
+    required: false
+    default: '3'
+  review-telemetry:
+    description: 'Emit per-finding disposition + per-session telemetry to .jbot-review/telemetry.jsonl (default true). Near-zero overhead: in-memory tagging plus one post-review write. Set false to disable.'
+    required: false
+    default: 'true'
+  evidence-quotes:
+    description: 'Ask each finding to carry a verbatim quote of the changed line it flags (default true). Grounds finding verification and lets a would-be-orphaned finding be re-anchored. Set false to keep the pre-F12 prompt.'
+    required: false
+    default: 'true'
+  fail-on-error:
+    description: 'Fail the workflow when the review cannot complete.'
+    required: false
+    default: 'true'
+
+outputs:
+  findings-posted:
+    description: 'Findings posted (or logged in dry-run) by this run. Unset when the review fails before completing.'
+  terminal-state:
+    description: 'completed when the review pipeline finished; failed when it aborted. Run-level coverage detail lands in .jbot-review/telemetry.jsonl — upload it as a workflow artifact to keep history.'
+
+runs:
+  using: 'docker'
+  image: 'docker://ghcr.io/pgup-ai/jbot-review:latest-slim'
+  entrypoint: 'node'
+  args: ['/app/dist/workflow/index.js']
+  env:
+    INPUT_PROVIDER: ${{ inputs.provider }}
+    INPUT_MODEL: ${{ inputs.model }}
+    INPUT_SDK-ENGINE: ${{ inputs.sdk-engine }}
+    JBOT_OPENCODE_HTTPS_PROXY: ${{ inputs.opencode-proxy-url }}
+    INPUT_OPENCODE-API-KEY: ${{ inputs.opencode-api-key }}
+    INPUT_DEEPSEEK-API-KEY: ${{ inputs.deepseek-api-key }}
+    INPUT_OPENAI-API-KEY: ${{ inputs.openai-api-key }}
+    INPUT_OPENAI-COMPATIBLE-API-KEY: ${{ inputs.openai-compatible-api-key }}
+    INPUT_OPENAI-COMPATIBLE-BASE-URL: ${{ inputs.openai-compatible-base-url }}
+    INPUT_ANTHROPIC-API-KEY: ${{ inputs.anthropic-api-key }}
+    INPUT_GEMINI-API-KEY: ${{ inputs.gemini-api-key }}
+    INPUT_OPENROUTER-API-KEY: ${{ inputs.openrouter-api-key }}
+    INPUT_NVIDIA-API-KEY: ${{ inputs.nvidia-api-key }}
+    INPUT_ZAI-API-KEY: ${{ inputs.zai-api-key }}
+    INPUT_KIMI-API-KEY: ${{ inputs.kimi-api-key }}
+    INPUT_XAI-API-KEY: ${{ inputs.xai-api-key }}
+    INPUT_FIREWORKS-API-KEY: ${{ inputs.fireworks-api-key }}
+    INPUT_MIMO-API-KEY: ${{ inputs.mimo-api-key }}
+    INPUT_TOKENROUTER-API-KEY: ${{ inputs.tokenrouter-api-key }}
+    INPUT_DEVIN-WINDSURF-API-KEY: ${{ inputs.devin-windsurf-api-key }}
+    INPUT_COMMANDCODE-ACCESS-KEY: ${{ inputs.commandcode-access-key }}
+    INPUT_CURSOR-API-KEY: ${{ inputs.cursor-api-key }}
+    INPUT_POOLSIDE-API-KEY: ${{ inputs.poolside-api-key }}
+    INPUT_QODER-TOKEN: ${{ inputs.qoder-token }}
+    INPUT_CODEX-AUTH: ${{ inputs.codex-auth }}
+    INPUT_CLINE-AUTH: ${{ inputs.cline-auth }}
+    INPUT_GROK-AUTH: ${{ inputs.grok-auth }}
+    INPUT_KILO-AUTH: ${{ inputs.kilo-auth }}
+    INPUT_DIM-AUTH: ${{ inputs.dim-auth }}
+    INPUT_ENABLE-CONTEXT7: ${{ inputs.enable-context7 }}
+    INPUT_CONTEXT7-API-KEY: ${{ inputs.context7-api-key }}
+    INPUT_GITHUB-TOKEN: ${{ inputs.github-token }}
+    INPUT_THREAD-RESOLUTION-TOKEN: ${{ inputs.thread-resolution-token }}
+    INPUT_PR-NUMBER: ${{ inputs.pr-number }}
+    INPUT_DRY-RUN: ${{ inputs.dry-run }}
+    INPUT_AUTO-APPROVE: ${{ inputs.auto-approve }}
+    INPUT_MAX-FINDINGS: ${{ inputs.max-findings }}
+    INPUT_MIN-SEVERITY: ${{ inputs.min-severity }}
+    INPUT_INCLUDE-PRIOR-COMMENTS: ${{ inputs.include-prior-comments }}
+    INPUT_ENABLE-GUIDELINE-PASS: ${{ inputs.enable-guideline-pass }}
+    INPUT_REVIEW-PASSES: ${{ inputs.review-passes }}
+    INPUT_VERIFY-FINDINGS: ${{ inputs.verify-findings }}
+    INPUT_TIME-BUDGET-MINUTES: ${{ inputs.time-budget-minutes }}
+    INPUT_REVIEW-SHARDS: ${{ inputs.review-shards }}
+    INPUT_DYNAMIC-FANOUT: ${{ inputs.dynamic-fanout }}
+    INPUT_MODEL-OPTIONS: ${{ inputs.model-options }}
+    INPUT_PROMPT-CACHE: ${{ inputs.prompt-cache }}
+    INPUT_SKIP-DOC-ONLY: ${{ inputs.skip-doc-only }}
+    INPUT_MAX-CONCURRENT-SESSIONS: ${{ inputs.max-concurrent-sessions }}
+    INPUT_REVIEW-TELEMETRY: ${{ inputs.review-telemetry }}
+    INPUT_EVIDENCE-QUOTES: ${{ inputs.evidence-quotes }}
+    INPUT_FAIL-ON-ERROR: ${{ inputs.fail-on-error }}

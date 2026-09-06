@@ -56,6 +56,32 @@ rest is that provider's own model id.
 | <img src="docs/assets/logos/vercel.svg" width="15" style="vertical-align: -0.125em;" alt=""> Vercel | `model: opencode/vercel/…` | Fully supported |
 | <img src="docs/assets/logos/xai.svg" width="15" style="vertical-align: -0.125em;" alt=""> xAI | `model: xai/…` | Fully supported |
 
+## Slim image
+
+The existing `pgup-ai/jbot-review-action@v0` entry point keeps using the full
+image. To opt into the smaller image, change only the action path:
+
+```yaml
+- uses: pgup-ai/jbot-review-action/slim@v0
+  with:
+    model: opencode/your-model
+    opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+Slim uses `ghcr.io/pgup-ai/jbot-review:latest-slim`. It includes **OpenCode,
+CommandCode and Devin**, plus the same reviewer code and SDK engines. Inputs,
+outputs, review prompts and finding policy match the full action. Every model
+in a pool must use a supported runtime; omitted local CLIs cause a clear
+configuration error before selection. Cursor, Codex and Kilo remain available
+through a configured ACP gateway, where the companion supplies those CLIs.
+
+The slim metadata is generated from the root `action.yml`. After editing action
+inputs or outputs, run `node scripts/sync-slim.mjs`; CI checks the two entry
+points differ only in the image tag. Both action entry points follow floating
+image tags; pin the Docker image directly by digest or commit tag when an exact
+reviewer revision is required.
+
 ## Usage
 
 Copy [`examples/jbot-review.yml`](examples/jbot-review.yml) into
