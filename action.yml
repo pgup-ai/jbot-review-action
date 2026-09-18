@@ -23,7 +23,7 @@ inputs:
     required: false
     default: ''
   opencode-api-key:
-    description: 'OpenCode API key. Used when the main or aux model names opencode/opencode-go.'
+    description: 'OpenCode API key. Used when the main or aux model names opencode/opencode-go. Accepts a comma-separated list: each run probes the Go plan meters and picks the key with the most weekly allowance left, logging each key meter line first (probing failing entirely falls back to the first key); a single key skips the probe.'
     required: false
     default: ''
   deepseek-api-key:
