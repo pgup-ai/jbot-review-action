@@ -40,7 +40,7 @@ rest is that provider's own model id.
 | <img src="docs/assets/logos/xai.svg" width="15" style="vertical-align: -0.125em;" alt=""> Grok Build | `model: grok/…` | Fully supported |
 | <img src="docs/assets/logos/dim.svg" width="15" style="vertical-align: -0.125em;" alt=""> DimAgent | `model: dim/…` (OAuth plan; bundle credential) | Fully supported |
 | <img src="docs/assets/logos/kilo.svg" width="15" style="vertical-align: -0.125em;" alt=""> Kilo | `model: kilo/…` (free gateway default) | Fully supported |
-| <img src="docs/assets/logos/kimi.svg" width="15" style="vertical-align: -0.125em;" alt=""> Kimi | `model: kimi-for-coding/…` (Coding Plan API key) or `opencode-go/kimi-…` | Fully supported |
+| <img src="docs/assets/logos/kimi.svg" width="15" style="vertical-align: -0.125em;" alt=""> Kimi | `model: kimi-code-plan-global/…` or `kimi-code-plan-cn/…` (Coding Plan API key) or `opencode-go/kimi-…` | Fully supported |
 | <img src="docs/assets/logos/minimax.svg" width="15" style="vertical-align: -0.125em;" alt=""> MiniMax | `model: opencode/minimax-…` or `opencode-go/minimax-…` | Fully supported |
 | <img src="docs/assets/logos/mimo.svg" width="15" style="vertical-align: -0.125em;" alt=""> MiMo | `model: xiaomi-token-plan-sgp/…` or `opencode-go/mimo-…` | Fully supported |
 | <img src="docs/assets/logos/nvidia.svg" width="15" style="vertical-align: -0.125em;" alt=""> NVIDIA | `model: nvidia/…` | Fully supported |
@@ -205,7 +205,7 @@ final sign-off with a stronger model than the auto-review default:
 
 | Input                        | Required | Default               | Description                                                                                                                                                                                                                                                                                                                                                           |
 | ---------------------------- | -------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `provider`                   | No       | from `model`          | Deprecated — qualify `model` instead; pins the provider for `model` when set (`JBOT_REVIEW_PROVIDER`). Valid ids: opencode, opencode-go, deepseek, openai, openai-compatible, anthropic, google, openrouter, nvidia, zai-coding-plan, kimi-for-coding, xai, xiaomi-token-plan-sgp, fireworks-ai, tokenrouter, poolside, devin, commandcode, cursor, qoder, dim, codex, cline, cline-pass, grok, kilo |
+| `provider`                   | No       | from `model`          | Deprecated — qualify `model` instead; pins the provider for `model` when set (`JBOT_REVIEW_PROVIDER`). Valid ids: opencode, opencode-go, deepseek, openai, openai-compatible, anthropic, google, openrouter, nvidia, zai-coding-plan, kimi-code-plan-global, kimi-code-plan-cn, xai, xiaomi-token-plan-sgp, fireworks-ai, tokenrouter, poolside, devin, commandcode, cursor, qoder, dim, codex, cline, cline-pass, grok, kilo |
 | `model`                      | No       | `opencode` default    | `provider/model` reference, or a comma-separated pool that may span providers; auxiliary sessions draw from it too, on a salted seed; required for `openai-compatible`                                                                                                                                                                                                                                                       |
 | `sdk-engine`                 | No       | `auto`                | `auto` uses pi for cataloged models; `opencode` pins SDK sessions to OpenCode                                                                                                                                                                                                                                                                                         |
 | `opencode-proxy-url`         | No       | —                     | Optional HTTP/HTTPS proxy URL for OpenCode; successful verification pins SDK sessions to OpenCode; ignored for fork-head PRs and skipped without failing the review when unavailable                                                                                                                                                                                  |
@@ -219,7 +219,7 @@ final sign-off with a stronger model than the auto-review default:
 | `openrouter-api-key`         | No       | —                     | Used when the main or aux model names `openrouter`                                                                                                                                                                                                                                                                                                                    |
 | `nvidia-api-key`             | No       | —                     | Used when the main or aux model names `nvidia`                                                                                                                                                                                                                                                                                                                        |
 | `zai-api-key`                | No       | —                     | Used when the main or aux model names `zai-coding-plan`                                                                                                                                                                                                                                                                                                               |
-| `kimi-api-key`               | No       | —                     | Used when the main or aux model names `kimi-for-coding`                                                                                                                                                                                                                                                                                                               |
+| `kimi-api-key`               | No       | —                     | Used when the main or aux model names a Kimi provider                                                                                                                                                                                                                                                                                                                 |
 | `xai-api-key`                | No       | —                     | Used by `xai`, or by `grok` when `grok-auth` is empty                                                                                                                                                                                                                                                                                                                 |
 | `fireworks-api-key`          | No       | —                     | Used when the main or aux model names `fireworks-ai`                                                                                                                                                                                                                                                                                                                  |
 | `mimo-api-key`               | No       | —                     | Used when the main or aux model names `xiaomi-token-plan-sgp`                                                                                                                                                                                                                                                                                                         |
@@ -311,12 +311,13 @@ Provider API keys can also be supplied through their standard env vars, such as
 also read `JBOT_OPENAI_COMPATIBLE_BASE_URL`. `opencode-go` uses the same
 `OPENCODE_API_KEY` as
 `opencode`.
-Use a `model` on `kimi-for-coding` with `kimi-api-key` / `KIMI_API_KEY` for the
-native Kimi Coding Plan provider. Its current default is `kimi-for-coding/k3`:
+Use a `model` on `kimi-code-plan-global` (kimi.ai) or `kimi-code-plan-cn`
+(kimi.com) with `kimi-api-key` / `KIMI_API_KEY` for the native Kimi Coding Plan
+providers; pick the domain that issued the key. Their current default is K3:
 
 ```yaml
 with:
-  model: kimi-for-coding/k3
+  model: kimi-code-plan-global/k3
   kimi-api-key: ${{ secrets.KIMI_API_KEY }}
 ```
 
@@ -460,7 +461,7 @@ comments), `issues: write` (PR reactions), and `checks: read`. On
 **What runs the review under the hood?**
 Model-key providers route automatically through the in-process
 [pi](https://pi.dev/) SDK when its catalog contains the selected model and the
-OpenCode server otherwise; `kimi-for-coding` and `openai-compatible` use
+OpenCode server otherwise; the Kimi providers and `openai-compatible` use
 OpenCode, while Poolside uses its direct chat-completions backend. Set
 `sdk-engine: opencode` to pin all eligible SDK sessions to OpenCode.
 Coding-CLI backends (Codex, Cursor, Devin, Cline, Grok Build, Kilo, Command
