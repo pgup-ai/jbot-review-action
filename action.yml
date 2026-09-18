@@ -63,7 +63,7 @@ inputs:
     required: false
     default: ''
   kimi-api-key:
-    description: 'Kimi API key. Used when the main or aux model names kimi-for-coding.'
+    description: 'Kimi API key. Used when the main or aux model names a Kimi provider.'
     required: false
     default: ''
   xai-api-key:
