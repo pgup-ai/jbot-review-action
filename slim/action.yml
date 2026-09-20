@@ -163,7 +163,7 @@ inputs:
     required: false
     default: 'true'
   enable-guideline-pass:
-    description: 'Run a dedicated guideline-compliance review session when repository guidelines are discovered.'
+    description: 'Check discovered repository guidelines; may share the first auxiliary review pass or an opted-in main-session sweep.'
     required: false
     default: 'true'
   review-passes:
