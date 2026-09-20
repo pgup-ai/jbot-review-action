@@ -179,7 +179,7 @@ inputs:
     required: false
     default: '30'
   review-shards:
-    description: 'Parallel shards for the main review. 1 = no sharding, one full-diff session (default). 0 = auto from diff size, capped at 4. N = pin N shards. Sharding only speeds up review on providers that serve concurrent sessions; on free/throttled tiers the shards serialize on one API key, so 1 is the better default. Either way the review covers the complete diff. Raise it (and pair with max-concurrent-sessions) only on paid tiers with real concurrency, or for very large PRs where smaller per-shard context helps depth.'
+    description: 'Initial file groups for main review: 1 (default), 0 for automatic grouping, or N groups. Every group is paged again as needed to fit the assembled prompt; oversized files split by hunk. All pages run under max-concurrent-sessions.'
     required: false
     default: '1'
   dynamic-fanout:
@@ -202,7 +202,7 @@ inputs:
     required: false
     default: 'true'
   max-concurrent-sessions:
-    description: 'Max model sessions in flight at once (default 3; 0 = unlimited). Throttled provider tiers serialize concurrent requests on one key upstream; capping on our side keeps session deadlines measuring model time, not queue time. Set 2 on tight free tiers, or 0 for unlimited on paid concurrent tiers.'
+    description: 'Max model sessions in flight at once (default 3; 0 also uses 3). Additional diff pages wait in the queue. Set a positive limit appropriate for the provider tier.'
     required: false
     default: '3'
   review-telemetry:
