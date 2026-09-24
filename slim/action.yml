@@ -171,7 +171,7 @@ inputs:
     required: false
     default: '1'
   verify-findings:
-    description: 'Verify all findings, including P3 and nits, in severity-ordered batches before posting. Refuted findings are dropped; uncertain candidates remain in diagnostics and are withheld from PR comments.'
+    description: 'Verify all findings, including P3 and nits, in severity-ordered batches before posting. Refuted findings are dropped; uncertain candidates remain in diagnostics and are withheld from PR comments, except up to two concrete P0–P2 findings a run whose verification returned no verdict, which post labeled Unverified within max-findings and min-severity.'
     required: false
     default: 'true'
   time-budget-minutes:
