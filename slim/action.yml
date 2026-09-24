@@ -194,9 +194,9 @@ inputs:
     required: false
     default: 'true'
   skip-doc-only:
-    description: 'Skip the full LLM review when a PR changes only documentation, prose, or diagram assets (.md, .mdx, .markdown, .rst, .adoc, .txt, .pdf, .svg, .drawio, .dio, .excalidraw, .mmd, .puml, .plantuml). The reaction is left unchanged (a docs push does not change the verdict, so a prior clean reaction stays and an open-findings PR stays reaction-less); a single code/config file forces a full review. Deterministic, no model call.'
+    description: 'Set true to skip the full LLM review when a PR changes only documentation, prose, or diagram assets (.md, .mdx, .markdown, .rst, .adoc, .txt, .pdf, .svg, .drawio, .dio, .excalidraw, .mmd, .puml, .plantuml). The reaction is left unchanged (a docs push does not change the verdict, so a prior clean reaction stays and an open-findings PR stays reaction-less); a single code/config file forces a full review. Deterministic, no model call. Off by default: review guidance lives in docs, so their changes are reviewed too.'
     required: false
-    default: 'true'
+    default: 'false'
   skip-unchanged:
     description: 'Skip the full LLM review when the merge-base-relative patch set is byte-identical to the one the last posted jbot review covered — the common "Update branch" merge from main. Anything uncertain (no prior posted review, compare failure or its 300-file cap, binary/patchless files) fails open to a full review; comment-triggered, manually dispatched, and auto-approve runs always review (approval must re-attest the newest head). Deterministic, no model call.'
     required: false

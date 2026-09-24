@@ -255,7 +255,7 @@ jobs:
           review-shards: ${{ vars.JBOT_REVIEW_SHARDS || '1' }}
           model-options: ${{ vars.JBOT_MODEL_OPTIONS || '' }}
           prompt-cache: ${{ vars.JBOT_PROMPT_CACHE || 'true' }}
-          skip-doc-only: ${{ vars.JBOT_SKIP_DOC_ONLY || 'true' }}
+          skip-doc-only: ${{ vars.JBOT_SKIP_DOC_ONLY || 'false' }}
           max-concurrent-sessions: ${{ vars.JBOT_MAX_CONCURRENT_SESSIONS || '0' }}
           review-telemetry: ${{ vars.JBOT_REVIEW_TELEMETRY || 'true' }}
           evidence-quotes: ${{ vars.JBOT_EVIDENCE_QUOTES || 'true' }}
