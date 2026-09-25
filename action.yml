@@ -15,7 +15,7 @@ inputs:
     required: false
     default: ''
   sdk-engine:
-    description: 'SDK routing: opencode (default) runs every SDK session on opencode; auto uses pi when its catalog has the selected model, otherwise opencode.'
+    description: 'SDK routing: opencode (default) runs SDK sessions on opencode (Poolside keeps its own backend); auto uses pi when its catalog has the selected model, otherwise opencode.'
     required: false
     default: ''
   opencode-proxy-url:
