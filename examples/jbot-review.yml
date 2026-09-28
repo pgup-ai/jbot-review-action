@@ -237,6 +237,16 @@ jobs:
           # PR share a runId otherwise, and the gateway's append+seq-dedup
           # journal then drops the newer transcript as already-seen.
           JBOT_OBSERVER_RUN: ${{ github.repository }}-pr-${{ github.event.pull_request.number || inputs['pr-number'] || github.event.issue.number }}-${{ github.run_id }}-${{ github.run_attempt }}
+          # jbot's env-only settings, switchable from same-named repo variables;
+          # an unset variable arrives empty and keeps jbot's default.
+          JBOT_COMMANDCODE_TOOLS: ${{ vars.JBOT_COMMANDCODE_TOOLS }}
+          JBOT_GUIDELINE_SWEEP: ${{ vars.JBOT_GUIDELINE_SWEEP }}
+          JBOT_VERIFY_OVERLAP_GRACE: ${{ vars.JBOT_VERIFY_OVERLAP_GRACE }}
+          JBOT_REVIEW_EXPERIMENT: ${{ vars.JBOT_REVIEW_EXPERIMENT }}
+          JBOT_CONTEXT_TRIM: ${{ vars.JBOT_CONTEXT_TRIM }}
+          JBOT_EMBEDDED_FIRST_PROMPT: ${{ vars.JBOT_EMBEDDED_FIRST_PROMPT }}
+          JBOT_SHARED_PREFIX_PROMPT: ${{ vars.JBOT_SHARED_PREFIX_PROMPT }}
+          JBOT_RULES_ONLY_TESTS: ${{ vars.JBOT_RULES_ONLY_TESTS }}
         with:
           # Precedence: /jbot comment flag > dispatch input > repo variable > default.
           provider: ${{ needs.command.outputs.provider || inputs.provider || vars.JBOT_REVIEW_PROVIDER || '' }}
