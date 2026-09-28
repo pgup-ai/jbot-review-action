@@ -276,6 +276,12 @@ Use repository or organization Actions variables `JBOT_REVIEW_MODEL` and
 `JBOT_SDK_ENGINE` to change future review runs without editing workflow YAML.
 (`JBOT_REVIEW_PROVIDER` still works, but a qualified model makes it
 unnecessary.)
+Settings jbot reads from the environment rather than from inputs take effect
+only when the workflow maps them. [`examples/jbot-review.yml`](examples/jbot-review.yml)
+maps each one from a same-named variable, such as `JBOT_CONTEXT_TRIM` or
+`JBOT_RULES_ONLY_TESTS`. An unset variable keeps jbot's default. The
+[jbot-review README](https://github.com/pgup-ai/jbot-review#local-review)
+describes each setting.
 The action uses the key matching each pool candidate's provider, since the main
 pass and the auxiliary sessions both draw from that one pool. The example can
 pass multiple provider secrets and leave unused ones empty. The pool comes from
