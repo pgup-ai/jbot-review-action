@@ -80,6 +80,8 @@ every main and auxiliary model. It contains no other provider CLI or SDK and
 does not allow gateway routes. Slim retains its included CLIs, SDK engines and
 gateway routes. All variants share the reviewer code, inputs, outputs, review
 prompts and finding policy. Unsupported models fail before pool selection.
+The shared metadata also lists other provider inputs; these do not enable those
+providers in the OpenCode image. Use `opencode-api-key` for both Zen and Go.
 
 Variant metadata is generated from the root `action.yml`. After editing action
 inputs or outputs, run `node scripts/sync-variants.mjs`; CI checks all entry
