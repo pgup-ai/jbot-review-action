@@ -226,7 +226,7 @@ outputs:
 
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/pgup-ai/jbot-review:latest-slim'
+  image: 'docker://ghcr.io/pgup-ai/jbot-review:latest-opencode'
   entrypoint: 'node'
   args: ['/app/dist/workflow/index.js']
   env:

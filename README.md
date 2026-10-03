@@ -56,31 +56,39 @@ rest is that provider's own model id.
 | <img src="docs/assets/logos/vercel.svg" width="15" style="vertical-align: -0.125em;" alt=""> Vercel | `model: opencode/vercel/…` | Fully supported |
 | <img src="docs/assets/logos/xai.svg" width="15" style="vertical-align: -0.125em;" alt=""> xAI | `model: xai/…` | Fully supported |
 
-## Slim image
+## Image variants
 
-The existing `pgup-ai/jbot-review-action@v0` entry point keeps using the full
-image. To opt into the smaller image, change only the action path:
+The existing `pgup-ai/jbot-review-action@v0` entry point uses the full image.
+Change only the action path to select a smaller image:
+
+| Action | Image tag | Included local CLIs |
+| --- | --- | --- |
+| `pgup-ai/jbot-review-action@v0` | `latest` | All supported CLIs |
+| `pgup-ai/jbot-review-action/slim@v0` | `latest-slim` | OpenCode, CommandCode, Devin |
+| `pgup-ai/jbot-review-action/opencode@v0` | `latest-opencode` | OpenCode only |
 
 ```yaml
-- uses: pgup-ai/jbot-review-action/slim@v0
+- uses: pgup-ai/jbot-review-action/opencode@v0
   with:
-    model: opencode/your-model
+    model: opencode-go/your-model
     opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
     github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-Slim uses `ghcr.io/pgup-ai/jbot-review:latest-slim`. It includes **OpenCode,
-CommandCode and Devin**, plus the same reviewer code and SDK engines. Inputs,
-outputs, review prompts and finding policy match the full action. Every model
-in a pool must use a supported runtime; omitted local CLIs cause a clear
-configuration error before selection. Cursor, Codex and Kilo remain available
-through a configured ACP gateway, where the companion supplies those CLIs.
+The OpenCode image accepts only Zen (`opencode/…`) and Go (`opencode-go/…`) for
+every main and auxiliary model. It contains no other provider CLI or SDK and
+does not allow gateway routes. Slim retains its included CLIs, SDK engines and
+gateway routes. All variants share the reviewer code, inputs, outputs, review
+prompts and finding policy. Unsupported models fail before pool selection.
+The shared metadata also lists other provider inputs; these do not enable those
+providers in the OpenCode image. Use `opencode-api-key` for both Zen and Go.
 
-The slim metadata is generated from the root `action.yml`. After editing action
-inputs or outputs, run `node scripts/sync-slim.mjs`; CI checks the two entry
-points differ only in the image tag. Both action entry points follow floating
+Variant metadata is generated from the root `action.yml`. After editing action
+inputs or outputs, run `node scripts/sync-variants.mjs`; CI checks all entry
+points differ only in the image tag. All action entry points follow floating
 image tags; pin the Docker image directly by digest or commit tag when an exact
-reviewer revision is required.
+reviewer revision is required. The OpenCode entry point requires the
+`latest-opencode` image to be published before use.
 
 ## Usage
 

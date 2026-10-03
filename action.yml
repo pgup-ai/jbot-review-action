@@ -1,5 +1,5 @@
 name: 'J-Bot Code Review'
-description: 'Open-source agentic PR review in your own CI — bring your model key or a CLI subscription (Codex, Cursor & more). $0/seat.'
+description: 'Open-source agentic PR review in your own CI. Model support depends on the image variant. $0/seat.'
 
 branding:
   icon: 'git-pull-request'
@@ -11,11 +11,11 @@ inputs:
     required: false
     default: ''
   model:
-    description: "Model as provider/model, e.g. opencode/deepseek-v4-flash-free. Only the first segment selects the provider; the rest is that provider's own model id and may itself contain slashes (kilo/zai/glm-5.2). A comma-separated list is a pool; the first attempt picks by PR head sha and rerun attempts advance through it. Candidates may name different providers, and every provider they draw on needs its own key. Auxiliary sessions (recall lens passes, addressed-thread check, guideline compliance, finding verification) draw from this same pool on a salted seed, so their pick is independent of the main one rather than locked to it; both hash into the same pool, so roughly 1/n of runs give both roles the same candidate. Uses the provider default if unset; required for openai-compatible."
+    description: "Model as provider/model, e.g. opencode/deepseek-v4-flash-free. Only the first segment selects the provider; the rest is that provider's own model id and may itself contain slashes (kilo/zai/glm-5.2). A comma-separated list is a pool; the first attempt picks by PR head sha and rerun attempts advance through it. Candidates may name different providers supported by the selected image, and every provider they draw on needs its own key. The opencode image accepts only opencode/ and opencode-go/ models. Auxiliary sessions (recall lens passes, addressed-thread check, guideline compliance, finding verification) draw from this same pool on a salted seed, so their pick is independent of the main one rather than locked to it; both hash into the same pool, so roughly 1/n of runs give both roles the same candidate. Uses the provider default if unset; required for openai-compatible."
     required: false
     default: ''
   sdk-engine:
-    description: 'SDK routing: opencode (default) runs SDK sessions on opencode (Poolside keeps its own backend); auto uses pi when its catalog has the selected model, otherwise opencode.'
+    description: 'OpenCode SDK engine: opencode (default); legacy auto logs a warning and uses OpenCode.'
     required: false
     default: ''
   opencode-proxy-url:
