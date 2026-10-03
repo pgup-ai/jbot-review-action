@@ -15,7 +15,7 @@ inputs:
     required: false
     default: ''
   sdk-engine:
-    description: 'OpenCode SDK engine: opencode (default); legacy auto logs a warning and uses OpenCode. Provider support depends on the image variant.'
+    description: 'OpenCode SDK engine: opencode (default); legacy auto logs a warning and uses OpenCode.'
     required: false
     default: ''
   opencode-proxy-url:
