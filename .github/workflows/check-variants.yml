@@ -1,4 +1,4 @@
-name: Check slim action
+name: Check action variants
 
 on:
   pull_request:
@@ -16,4 +16,4 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-      - run: node scripts/sync-slim.mjs --check
+      - run: node scripts/sync-variants.mjs --check
