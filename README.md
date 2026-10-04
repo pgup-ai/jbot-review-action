@@ -79,10 +79,10 @@ The OpenCode image supports all [J-Bot providers](https://github.com/pgup-ai/jbo
 routed through OpenCode, including direct DeepSeek, for every main and auxiliary
 model. J-Bot's provider and credential configuration still applies; this does not
 expose OpenCode's entire upstream provider catalog. Other CLI backends, Poolside
-and gateway routes are excluded. Use the selected provider's key input, such as
+and ACP gateway routes are excluded. Use the selected provider's key input, such as
 `deepseek-api-key` for DeepSeek or `opencode-api-key` for Zen and Go.
 
-Slim retains its included CLIs, SDK engines and gateway routes. All variants share
+Slim retains its included CLIs, SDK engines and ACP gateway routes. All variants share
 the reviewer code, inputs, outputs, review prompts and finding policy. Unsupported
 models fail before pool selection.
 
