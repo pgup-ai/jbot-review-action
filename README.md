@@ -70,18 +70,21 @@ Change only the action path to select a smaller image:
 ```yaml
 - uses: pgup-ai/jbot-review-action/opencode@v0
   with:
-    model: opencode-go/your-model
-    opencode-api-key: ${{ secrets.OPENCODE_API_KEY }}
+    model: deepseek/deepseek-flash
+    deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
     github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-The OpenCode image accepts only Zen (`opencode/…`) and Go (`opencode-go/…`) for
-every main and auxiliary model. It contains no other provider CLI or SDK and
-does not allow gateway routes. Slim retains its included CLIs, SDK engines and
-gateway routes. All variants share the reviewer code, inputs, outputs, review
-prompts and finding policy. Unsupported models fail before pool selection.
-The shared metadata also lists other provider inputs; these do not enable those
-providers in the OpenCode image. Use `opencode-api-key` for both Zen and Go.
+The OpenCode image supports all [J-Bot providers](https://github.com/pgup-ai/jbot-review#provider-configuration-in-repo)
+routed through OpenCode, including direct DeepSeek, for every main and auxiliary
+model. J-Bot's provider and credential configuration still applies; this does not
+expose OpenCode's entire upstream provider catalog. Other CLI backends, Poolside
+and gateway routes are excluded. Use the selected provider's key input, such as
+`deepseek-api-key` for DeepSeek or `opencode-api-key` for Zen and Go.
+
+Slim retains its included CLIs, SDK engines and gateway routes. All variants share
+the reviewer code, inputs, outputs, review prompts and finding policy. Unsupported
+models fail before pool selection.
 
 Variant metadata is generated from the root `action.yml`. After editing action
 inputs or outputs, run `node scripts/sync-variants.mjs`; CI checks all entry
